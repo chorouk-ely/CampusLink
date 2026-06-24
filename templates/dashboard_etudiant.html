@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CampusLink - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar">
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item active">🏠 Dashboard</a>
+            <a href="#" class="nav-item">📊 My Grades</a>
+            <a href="#" class="nav-item">📅 Attendance</a>
+            <a href="#" class="nav-item">📄 Documents</a>
+            <a href="#" class="nav-item">👤 My Profile</a>
+            <a href="#" class="nav-item">💬 Send Appeal to Teacher</a>
+            <a href="#" class="nav-item">⚙️ Settings</a>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <h2>Welcome back, {{ nom }}!</h2>
+            <div class="topbar-right">
+                <span>🔔</span>
+                <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
+            </div>
+        </header>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <p class="stat-label">Overall GPA</p>
+                <h2>-- / 20</h2>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Attendance</p>
+                <h2>-- %</h2>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Last 5 Grades</p>
+                <p>À venir</p>
+            </div>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

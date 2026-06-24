@@ -1,0 +1,115 @@
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    background-color: #0d1b2a;
+    color: white;
+    padding: 20px;
+}
+
+.sidebar-profile {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-profile img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.nav-item {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 8px;
+}
+
+.nav-item:hover {
+    background-color: #1b2c3f;
+}
+
+.nav-item.active {
+    background-color: #2ebd85;
+    color: white;
+    font-weight: bold;
+}
+
+.main-content {
+    flex: 1;
+    background-color: #f7f8fa;
+    padding: 30px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.topbar-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.stats-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 25px;
+    flex: 1;
+    min-width: 220px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.stat-label {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+.badge-status {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+}
+
+.badge-status.passed {
+    background-color: #2ebd85;
+}
+
+.badge-status.remedial {
+    background-color: #e74c3c;
+}
+
+.grades-table input {
+    width: 80px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

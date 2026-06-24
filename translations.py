@@ -1,0 +1,30 @@
+TRANSLATIONS = {
+    'fr': {
+        'welcome': 'Bienvenue sur CampusLink',
+        'access_title': 'Accédez à votre univers académique',
+        'email_label': 'Adresse e-mail / N° étudiant',
+        'password_label': 'Mot de passe',
+        'remember_me': 'Se souvenir de moi',
+        'forgot_password': 'Mot de passe oublié ?',
+        'submit': 'SE CONNECTER',
+        'need_help': 'Besoin d\u2019aide ?',
+        'contact_support': 'Contactez support@supmti.ma',
+        'first_time': 'Première connexion ?',
+        'setup_here': 'Configurez ici',
+        'important': 'IMPORTANT',
+    },
+    'ar': {
+        'welcome': 'مرحبًا بك في CampusLink',
+        'access_title': 'الوصول إلى عالمك الأكاديمي',
+        'email_label': 'البريد الإلكتروني / رقم الطالب',
+        'password_label': 'كلمة المرور',
+        'remember_me': 'تذكرني',
+        'forgot_password': 'هل نسيت كلمة المرور؟',
+        'submit': 'تسجيل الدخول',
+        'need_help': 'تحتاج مساعدة؟',
+        'contact_support': 'اتصل support@supmti.ma',
+        'first_time': 'أول مرة تسجل الدخول؟',
+        'setup_here': 'قم بالتهيئة هنا',
+        'important': 'مهم',
+    }
+}

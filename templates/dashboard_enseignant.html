@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CampusLink - Dashboard Enseignant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar">
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard_enseignant') }}" class="nav-item active">🏠 Dashboard</a>
+            <a href="{{ url_for('grade_entry') }}" class="nav-item">📝 Grade Entry</a>
+            <a href="#" class="nav-item">📢 Appeals</a>
+            <a href="#" class="nav-item">⚙️ Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2>Welcome back, {{ nom }}!</h2>
+        </header>
+        <p>Sélectionne "Grade Entry" dans le menu pour saisir des notes.</p>
+    </main>
+
+</div>
+</body>
+</html>
