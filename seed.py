@@ -4,18 +4,22 @@ connexion = sqlite3.connect('campuslink.db')
 curseur = connexion.cursor()
 
 curseur.execute(
-    "INSERT INTO users (nom, email, mot_de_passe, role, classe) VALUES (?, ?, ?, ?, ?)",
+    "INSERT OR IGNORE INTO users (nom, email, mot_de_passe, role, classe) VALUES (?, ?, ?, ?, ?)",
     ("Alex Étudiant", "alex@supmti.ma", "1234", "etudiant", "GI-Ann3")
 )
 
 curseur.execute(
-    "INSERT INTO users (nom, email, mot_de_passe, role, classe) VALUES (?, ?, ?, ?, ?)",
+    "INSERT OR IGNORE INTO users (nom, email, mot_de_passe, role, classe) VALUES (?, ?, ?, ?, ?)",
     ("Sara Benali", "sara@supmti.ma", "1234", "etudiant", "GI-Ann3")
 )
 
 curseur.execute(
-    "INSERT INTO users (nom, email, mot_de_passe, role, classe) VALUES (?, ?, ?, ?, ?)",
+    "INSERT OR IGNORE INTO users (nom, email, mot_de_passe, role, classe) VALUES (?, ?, ?, ?, ?)",
     ("Prof Karim", "karim@supmti.ma", "1234", "enseignant", None)
+)
+curseur.execute(
+    "INSERT OR IGNORE INTO users (nom, email, mot_de_passe, role, classe) VALUES (?, ?, ?, ?, ?)",
+    ("Sophie Chen", "sophie@supmti.ma", "1234", "admin", None)
 )
 
 # Récupérer les IDs des étudiants

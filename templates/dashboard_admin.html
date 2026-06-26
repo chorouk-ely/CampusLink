@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CampusLink - Back-Office Administration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <span class="logo-icon">🎓</span>
+            <div><strong>CampusLink</strong><br>SUPMTI</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard_admin') }}" class="nav-item active">🏠 Dashboard</a>
+            <a href="#" class="nav-item">📢 Announcements (CRUD)</a>
+            <a href="#" class="nav-item">📚 Academic Structuring</a>
+            <a href="#" class="nav-item">👥 User Management</a>
+            <a href="#" class="nav-item">⚖️ Grade Appeals & Litiges</a>
+            <a href="#" class="nav-item">🧾 Audit Logs</a>
+            <a href="#" class="nav-item">⚙️ System Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2>Back-Office Administration</h2>
+            <div class="topbar-right">
+                <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
+                <span>Admin: {{ nom }}</span>
+            </div>
+        </header>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <p class="stat-label">Total Étudiants</p>
+                <h2>{{ total_etudiants }}</h2>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Total Enseignants</p>
+                <h2>{{ total_enseignants }}</h2>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Classes</p>
+                <h2>{{ total_classes }}</h2>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Moyenne Générale</p>
+                <h2>{{ moyenne_generale }}/20</h2>
+            </div>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

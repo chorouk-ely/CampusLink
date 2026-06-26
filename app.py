@@ -1,6 +1,8 @@
 from flask import Flask, render_template, session, redirect, url_for, request
 import sqlite3
 from translations import TRANSLATIONS
+import random
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -148,7 +150,32 @@ def grade_entry():
 def dashboard_admin():
     if session.get('user_role') != 'admin':
         return redirect(url_for('login'))
-    return "Dashboard admin à venir"
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    curseur.execute("SELECT COUNT(*) FROM users WHERE role = 'etudiant'")
+    total_etudiants = curseur.fetchone()[0]
+
+    curseur.execute("SELECT COUNT(*) FROM users WHERE role = 'enseignant'")
+    total_enseignants = curseur.fetchone()[0]
+
+    curseur.execute("SELECT COUNT(DISTINCT classe) FROM users WHERE role = 'etudiant' AND classe IS NOT NULL")
+    total_classes = curseur.fetchone()[0]
+
+    curseur.execute("SELECT AVG((cc_grade + exam_grade) / 2) FROM notes WHERE cc_grade IS NOT NULL AND exam_grade IS NOT NULL")
+    moyenne_generale = curseur.fetchone()[0]
+
+    connexion.close()
+
+    return render_template(
+        'dashboard_admin.html',
+        nom=session.get('user_nom'),
+        total_etudiants=total_etudiants,
+        total_enseignants=total_enseignants,
+        total_classes=total_classes,
+        moyenne_generale=round(moyenne_generale, 2) if moyenne_generale else 0
+    )
 import random
 from datetime import datetime, timedelta
 

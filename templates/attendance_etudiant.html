@@ -30,7 +30,6 @@
             <header class="topbar">
                 <h2>Welcome back, {{ nom }}!</h2>
                 <div class="topbar-right">
-                    <span>🔔</span>
                     <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
                 </div>
             </header>
@@ -72,10 +71,10 @@
                             <td class="center">
                                 <div class="bar-visual">
                                     {% for i in range([row.presences, 10] | min) %}
-                                    <div class="bar-seg present" style="height: {{ 8 + i }}px;"></div>
+                                    <div class="bar-seg present" data-height="{{ 8 + i }}"></div>
                                     {% endfor %}
                                     {% for i in range([row.absences, 5] | min) %}
-                                    <div class="bar-seg absent" style="height: {{ 6 + i * 2 }}px;"></div>
+                                    <div class="bar-seg absent" data-height="{{ 6 + i * 2 }}"></div>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -95,6 +94,13 @@
 
         </main>
     </div>
+
+    <script>
+        document.querySelectorAll('.bar-seg').forEach(function(bar) {
+            const hauteur = bar.getAttribute('data-height');
+            bar.style.height = hauteur + 'px';
+        });
+    </script>
 </body>
 
 </html>
