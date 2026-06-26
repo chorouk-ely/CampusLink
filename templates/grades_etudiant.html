@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CampusLink - My Grades</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/grades.css') }}">
+</head>
+
+<body>
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-profile">
+                <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar">
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item">🏠 Dashboard</a>
+                <a href="{{ url_for('grades_etudiant') }}" class="nav-item active">📊 My Grades</a>
+                <a href="{{ url_for('attendance_etudiant') }}" class="nav-item">📅 Attendance</a>
+                <a href="{{ url_for('send_appeal') }}" class="nav-item">💬 Send Appeal to Teacher</a>
+                <a href="{{ url_for('settings_etudiant') }}" class="nav-item">⚙️ Settings</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="topbar">
+                <h2>Welcome back, {{ nom }}!</h2>
+                <div class="topbar-right">
+                    <span>🔔</span>
+                    <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
+                </div>
+            </header>
+
+            <!-- SUMMARY CARDS -->
+            <div class="stats-cards">
+                <div class="stat-card stat-card-passed">
+                    <p class="stat-label">Passed Modules</p>
+                    <div class="stat-value-row">
+                        <h2 class="stat-value-green">{{ passed }} / {{ total_modules }}</h2>
+                        <span class="stat-icon-green">✅</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-remedial">
+                    <p class="stat-label">Modules in Remedial</p>
+                    <div class="stat-value-row">
+                        <h2 class="stat-value-red">{{ remedial }}</h2>
+                        <span class="stat-icon-red">❶</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRADES TABLE -->
+            <div class="grades-card">
+                <div class="grades-card-header">
+                    <h3>My Detailed Grades</h3>
+                    <div class="semestre-selector">
+                        <select id="semestreSelect" onchange="filterSemestre(this.value)">
+                            {% for s in semestres %}
+                            <option value="{{ s }}" {% if s==semestre_actif %}selected{% endif %}>{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <table class="grades-view-table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>CC (/20)</th>
+                            <th>Exam (/20)</th>
+                            <th>Coeff</th>
+                            <th>Module Average</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in notes %}
+                        {% set moyenne = ((note.cc_grade or 0) * 0.4 + (note.exam_grade or 0) * 0.6) %}
+                        <tr>
+                            <td class="module-name">{{ note.module }}</td>
+                            <td>{{ note.cc_grade | default('--') }}/20</td>
+                            <td>{{ note.exam_grade | default('--') }}/20</td>
+                            <td>{{ note.coeff | default(2) }}</td>
+                            <td class="moyenne-cell">{{ "%.1f"|format(moyenne) }}/20</td>
+                            <td>
+                                {% if note.cc_grade is not none and note.exam_grade is not none %}
+                                {% if moyenne >= (note.seuil or 10) %}
+                                <span class="grade-badge passed">Passed ✅</span>
+                                {% else %}
+                                <span class="grade-badge remedial">Remedial 🔴</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="grade-badge pending">--</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/grades.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+/* ALERTS */
+.alert {
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #e8f8f1;
+    color: #2ebd85;
+    border: 1px solid #b7e8d4;
+}
+
+.alert-error {
+    background-color: #fdecea;
+    color: #e74c3c;
+    border: 1px solid #f5c6c2;
+}
+
+/* SETTINGS WRAPPER — centré */
+.settings-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* SETTINGS CARD */
+.settings-card {
+    background: white;
+    border-radius: 12px;
+    padding: 35px 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.settings-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+/* TOGGLE BUTTON */
+.toggle-section {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.toggle-section:hover {
+    border-color: #2ebd85;
+    background-color: #f7fdf9;
+}
+
+/* PASSWORD FORM — hidden by default */
+.password-form {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.password-form.visible {
+    display: flex;
+}
+
+/* INPUT GROUP */
+.input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.input-group:focus-within {
+    border-color: #2ebd85;
+}
+
+.input-icon {
+    padding: 12px 14px;
+    font-size: 16px;
+    background: white;
+    border-right: 1px solid #eee;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 12px 14px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #333;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.input-group input::placeholder {
+    color: #bbb;
+}
+
+/* FORM ACTIONS */
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 6px;
+}
+
+.btn-changer {
+    background-color: #2ebd85;
+    color: white;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-changer:hover {
+    background-color: #27a874;
+}
+
+.btn-annuler {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.btn-annuler:hover {
+    color: #333;
+}

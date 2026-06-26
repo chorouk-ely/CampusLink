@@ -1,0 +1,186 @@
+/* ALERTS */
+.alert {
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #e8f8f1;
+    color: #2ebd85;
+    border: 1px solid #b7e8d4;
+}
+
+.alert-error {
+    background-color: #fdecea;
+    color: #e74c3c;
+    border: 1px solid #f5c6c2;
+}
+
+/* APPEAL CARD */
+.appeal-card {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.appeal-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+}
+
+.appeal-label {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 12px;
+}
+
+/* FORM ROW */
+.appeal-form-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.appeal-textarea {
+    flex: 1;
+    min-height: 160px;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #333;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.appeal-textarea:focus {
+    border-color: #2ebd85;
+}
+
+.appeal-textarea::placeholder {
+    color: #bbb;
+}
+
+/* RIGHT SIDE */
+.appeal-form-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 260px;
+}
+
+.appeal-select {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background: white;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.appeal-select:focus {
+    border-color: #2ebd85;
+}
+
+/* BUTTONS */
+.btn-envoyer {
+    background-color: #2ebd85;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-envoyer:hover {
+    background-color: #27a874;
+}
+
+.btn-annuler {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.btn-annuler:hover {
+    color: #333;
+}
+
+/* HISTORY TABLE */
+.appeal-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.appeal-history-table thead tr {
+    border-bottom: 1px solid #e8eaed;
+}
+
+.appeal-history-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+}
+
+.appeal-history-table tbody tr {
+    border-bottom: 1px solid #f3f3f3;
+    transition: background 0.15s;
+}
+
+.appeal-history-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.appeal-history-table tbody tr:hover {
+    background-color: #f7f8fa;
+}
+
+.appeal-history-table td {
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #333;
+}
+
+.msg-contenu {
+    max-width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* STATUS BADGES */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.pending {
+    background-color: #fff8e1;
+    color: #f0a500;
+}
+
+.status-badge.answered {
+    background-color: #e8f8f1;
+    color: #2ebd85;
+}

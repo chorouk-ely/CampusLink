@@ -1,0 +1,191 @@
+/* SIDEBAR NAME */
+.sidebar-name {
+    color: #cbd5e1;
+    font-size: 13px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* ALERT */
+.alert {
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #e8f8f1;
+    color: #2ebd85;
+    border: 1px solid #b7e8d4;
+}
+
+/* LAYOUT */
+.appeals-layout {
+    display: flex;
+    gap: 20px;
+}
+
+/* COMPOSE CARD */
+.compose-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    flex: 1;
+}
+
+.compose-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+}
+
+.compose-card form {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.compose-textarea {
+    flex: 1;
+    min-height: 180px;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #333;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.compose-textarea:focus {
+    border-color: #2ebd85;
+}
+
+.compose-textarea::placeholder {
+    color: #bbb;
+}
+
+/* RIGHT CONTROLS */
+.compose-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 240px;
+}
+
+.compose-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background: white;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.compose-select:focus {
+    border-color: #2ebd85;
+}
+
+.btn-envoyer {
+    width: 100%;
+    background-color: #2ebd85;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-envoyer:hover {
+    background-color: #27a874;
+}
+
+/* APPEALS TABLE CARD */
+.appeals-table-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    margin-top: 25px;
+}
+
+.appeals-table-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 18px;
+}
+
+.appeals-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.appeals-table thead tr {
+    border-bottom: 1px solid #e8eaed;
+}
+
+.appeals-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+}
+
+.appeals-table tbody tr {
+    border-bottom: 1px solid #f3f3f3;
+    transition: background 0.15s;
+}
+
+.appeals-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.appeals-table tbody tr:hover {
+    background-color: #f7f8fa;
+}
+
+.appeals-table td {
+    padding: 13px 14px;
+    font-size: 14px;
+    color: #333;
+}
+
+.msg-contenu {
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* STATUS BADGES */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.pending {
+    background-color: #fff8e1;
+    color: #f0a500;
+}
+
+.status-badge.answered {
+    background-color: #e8f8f1;
+    color: #2ebd85;
+}

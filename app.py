@@ -268,5 +268,308 @@ def attendance_etudiant():
         semestre=semestre
     )
 
+# ROUTE : Tableau de bord des notes de l'étudiant
+# Affiche les notes par semestre (CC, Exam, Moyenne, Statut)
+# avec le nombre de modules validés et en rattrapage
+
+@app.route('/grades-etudiant')
+def grades_etudiant():
+    if session.get('user_role') != 'etudiant':
+        return redirect(url_for('login'))
+
+    etudiant_id = session.get('user_id')
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    # Tous les semestres disponibles pour cet étudiant
+    curseur.execute(
+        "SELECT DISTINCT semestre FROM notes WHERE etudiant_id = ? ORDER BY semestre",
+        (etudiant_id,)
+    )
+    semestres = [r[0] for r in curseur.fetchall()]
+    if not semestres:
+        semestres = ['Semestre 1']
+
+    # Semestre actif (depuis l'URL ou le premier disponible)
+    semestre_actif = request.args.get('semestre', semestres[0])
+
+    # Notes du semestre actif
+    curseur.execute('''
+        SELECT module, semestre, cc_grade, exam_grade, seuil
+        FROM notes
+        WHERE etudiant_id = ? AND semestre = ?
+        ORDER BY module
+    ''', (etudiant_id, semestre_actif))
+    rows = curseur.fetchall()
+    connexion.close()
+
+    notes = [
+        {
+            'module':     r[0],
+            'semestre':   r[1],
+            'cc_grade':   r[2],
+            'exam_grade': r[3],
+            'seuil':      r[4] if r[4] is not None else 10,
+            'coeff':      2
+        }
+        for r in rows
+    ]
+
+    # Calcul passed / remedial
+    passed  = 0
+    remedial = 0
+    for n in notes:
+        if n['cc_grade'] is not None and n['exam_grade'] is not None:
+            moyenne = n['cc_grade'] * 0.4 + n['exam_grade'] * 0.6
+            if moyenne >= n['seuil']:
+                passed += 1
+            else:
+                remedial += 1
+
+    return render_template(
+        'grades_etudiant.html',
+        nom=session.get('user_nom'),
+        notes=notes,
+        semestres=semestres,
+        semestre_actif=semestre_actif,
+        passed=passed,
+        remedial=remedial,
+        total_modules=len(notes)
+    )
+
+# ROUTE : Envoi d'un appel de l'étudiant vers un professeur
+# L'étudiant choisit un prof dans la liste et envoie un message
+# Le message est stocké dans la table "messages" avec statut "pending"
+from datetime import datetime
+
+@app.route('/send-appeal', methods=['GET', 'POST'])
+def send_appeal():
+    if session.get('user_role') != 'etudiant':
+        return redirect(url_for('login'))
+
+    etudiant_id = session.get('user_id')
+    success = False
+    erreur = None
+    form_contenu = ''
+    form_enseignant = ''
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    # Récupérer tous les professeurs depuis la base
+    curseur.execute("SELECT id, nom, email FROM users WHERE role = 'enseignant' ORDER BY nom")
+    rows = curseur.fetchall()
+    professeurs = [{'id': r[0], 'nom': r[1], 'email': r[2]} for r in rows]
+
+    if request.method == 'POST':
+        contenu = request.form.get('contenu', '').strip()
+        enseignant_id = request.form.get('enseignant_id')
+        form_contenu = contenu
+        form_enseignant = enseignant_id
+
+        if not contenu or not enseignant_id:
+            erreur = "Veuillez remplir tous les champs."
+        else:
+            curseur.execute('''
+                INSERT INTO messages (etudiant_id, enseignant_id, contenu, date_envoi, statut)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (etudiant_id, enseignant_id, contenu, datetime.now().strftime('%Y-%m-%d %H:%M'), 'pending'))
+            connexion.commit()
+            success = True
+            form_contenu = ''
+            form_enseignant = ''
+
+    # Historique des messages envoyés par cet étudiant
+    curseur.execute('''
+        SELECT messages.contenu, messages.date_envoi, messages.statut, messages.reponse, users.nom
+        FROM messages
+        JOIN users ON users.id = messages.enseignant_id
+        WHERE messages.etudiant_id = ?
+        ORDER BY messages.date_envoi DESC
+    ''', (etudiant_id,))
+    rows_hist = curseur.fetchall()
+    connexion.close()
+
+    historique = [
+        {
+            'contenu':    r[0],
+            'date_envoi': r[1],
+            'statut':     r[2],
+            'reponse':    r[3],
+            'prof_nom':   r[4]
+        }
+        for r in rows_hist
+    ]
+
+    return render_template(
+        'appeal.html',
+        nom=session.get('user_nom'),
+        professeurs=professeurs,
+        success=success,
+        erreur=erreur,
+        historique=historique,
+        form_contenu=form_contenu,
+        form_enseignant=form_enseignant
+    )
+
+# ROUTE : Interface Appeals du professeur
+# Le prof voit tous les messages reçus des étudiants,
+# peut filtrer par classe et envoyer une réponse à un étudiant
+# La réponse est stockée dans messages.reponse et le statut passe à 'answered'
+
+@app.route('/appeals-enseignant', methods=['GET', 'POST'])
+def appeals_enseignant():
+    if session.get('user_role') != 'enseignant':
+        return redirect(url_for('login'))
+
+    enseignant_id = session.get('user_id')
+    success = False
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    # Enregistrer la réponse du prof
+    if request.method == 'POST':
+        message_id = request.form.get('message_id')
+        reponse    = request.form.get('reponse', '').strip()
+
+        if message_id and reponse:
+            curseur.execute('''
+                UPDATE messages
+                SET reponse = ?, statut = 'answered'
+                WHERE id = ? AND enseignant_id = ?
+            ''', (reponse, message_id, enseignant_id))
+            connexion.commit()
+            success = True
+
+    # Récupérer tous les messages adressés à ce prof
+    curseur.execute('''
+        SELECT messages.id, messages.contenu, messages.date_envoi,
+               messages.statut, messages.reponse,
+               users.nom, users.classe
+        FROM messages
+        JOIN users ON users.id = messages.etudiant_id
+        WHERE messages.enseignant_id = ?
+        ORDER BY messages.date_envoi DESC
+    ''', (enseignant_id,))
+    rows = curseur.fetchall()
+
+    messages_pending  = []
+    messages_answered = []
+
+    for r in rows:
+        msg = {
+            'id':           r[0],
+            'contenu':      r[1],
+            'date_envoi':   r[2],
+            'statut':       r[3],
+            'reponse':      r[4],
+            'etudiant_nom': r[5],
+            'classe':       r[6]
+        }
+        if r[3] == 'pending':
+            messages_pending.append(msg)
+        else:
+            messages_answered.append(msg)
+
+    # Liste des classes disponibles pour le filtre
+    curseur.execute("SELECT DISTINCT classe FROM users WHERE role = 'etudiant' AND classe IS NOT NULL ORDER BY classe")
+    classes = [c[0] for c in curseur.fetchall()]
+
+    connexion.close()
+
+    return render_template(
+        'appeals_enseignant.html',
+        nom=session.get('user_nom'),
+        messages_pending=messages_pending,
+        messages_answered=messages_answered,
+        classes=classes,
+        success=success
+    )
+
+# FONCTION COMMUNE : Logique de changement de mot de passe
+# Utilisée par les deux routes (étudiant et enseignant)
+# Vérifie l'ancien MDP, que les deux nouveaux correspondent,
+# puis fait UPDATE dans users et retourne (success, erreur)
+
+def changer_mot_de_passe(user_id):
+    ancien_mdp    = request.form.get('ancien_mdp', '').strip()
+    nouveau_mdp   = request.form.get('nouveau_mdp', '').strip()
+    confirmer_mdp = request.form.get('confirmer_mdp', '').strip()
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    # Vérifier que l'ancien mot de passe est correct
+    curseur.execute(
+        "SELECT id FROM users WHERE id = ? AND mot_de_passe = ?",
+        (user_id, ancien_mdp)
+    )
+    valide = curseur.fetchone()
+
+    if not valide:
+        connexion.close()
+        return False, "L'ancien mot de passe est incorrect."
+
+    if nouveau_mdp != confirmer_mdp:
+        connexion.close()
+        return False, "Les deux nouveaux mots de passe ne correspondent pas."
+
+    if len(nouveau_mdp) < 4:
+        connexion.close()
+        return False, "Le nouveau mot de passe doit contenir au moins 4 caractères."
+
+    # UPDATE dans la base de données
+    curseur.execute(
+        "UPDATE users SET mot_de_passe = ? WHERE id = ?",
+        (nouveau_mdp, user_id)
+    )
+    connexion.commit()
+    connexion.close()
+
+    return True, None
+
+
+# ROUTE : Settings étudiant
+
+@app.route('/settings-etudiant', methods=['GET', 'POST'])
+def settings_etudiant():
+    if session.get('user_role') != 'etudiant':
+        return redirect(url_for('login'))
+
+    success, erreur = False, None
+
+    if request.method == 'POST':
+        success, erreur = changer_mot_de_passe(session.get('user_id'))
+
+    return render_template(
+        'settings.html',
+        nom=session.get('user_nom'),
+        role='etudiant',
+        success=success,
+        erreur=erreur
+    )
+
+# ROUTE : Settings enseignant
+
+@app.route('/settings-enseignant', methods=['GET', 'POST'])
+def settings_enseignant():
+    if session.get('user_role') != 'enseignant':
+        return redirect(url_for('login'))
+
+    success, erreur = False, None
+
+    if request.method == 'POST':
+        success, erreur = changer_mot_de_passe(session.get('user_id'))
+
+    return render_template(
+        'settings.html',
+        nom=session.get('user_nom'),
+        role='enseignant',
+        success=success,
+        erreur=erreur
+    )
+
 if __name__ == '__main__':
     app.run(debug=True)

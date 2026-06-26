@@ -15,12 +15,10 @@
         </div>
         <nav class="sidebar-nav">
             <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item active">🏠 Dashboard</a>
-            <a href="#" class="nav-item">📊 My Grades</a>
+            <a href="{{ url_for('grades_etudiant') }}" class="nav-item">📊 My Grades</a>
             <a href="{{ url_for('attendance_etudiant') }}" class="nav-item">📅 Attendance</a>
-            <a href="#" class="nav-item">📄 Documents</a>
-            <a href="#" class="nav-item">👤 My Profile</a>
-            <a href="#" class="nav-item">💬 Send Appeal to Teacher</a>
-            <a href="#" class="nav-item">⚙️ Settings</a>
+            <a href="{{ url_for('send_appeal') }}" class="nav-item">💬 Send Appeal to Teacher</a>
+            <a href="{{ url_for('settings_etudiant') }}" class="nav-item">⚙️ Settings</a>
         </nav>
     </aside>
 
