@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CampusLink - Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/attendance.css') }}">
+</head>
+
+<body>
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-profile">
+                <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar">
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item">🏠 Dashboard</a>
+                <a href="#" class="nav-item">📊 My Grades</a>
+                <a href="{{ url_for('attendance_etudiant') }}" class="nav-item active">📅 Attendance</a>
+                <a href="#" class="nav-item">📄 Documents</a>
+                <a href="#" class="nav-item">👤 My Profile</a>
+                <a href="#" class="nav-item">💬 Send Appeal to Teacher</a>
+                <a href="#" class="nav-item">⚙️ Settings</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="topbar">
+                <h2>Welcome back, {{ nom }}!</h2>
+                <div class="topbar-right">
+                    <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
+                </div>
+            </header>
+
+            <!-- SUMMARY CARDS -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <p class="stat-label">Total Présences</p>
+                    <h2 class="presence-count">{{ total_presences }}</h2>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-label">Total Absences</p>
+                    <h2 class="absence-count">{{ total_absences }}</h2>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-label">Séances Totales</p>
+                    <h2>{{ total_seances }}</h2>
+                </div>
+            </div>
+
+            <!-- ATTENDANCE TABLE -->
+            <div class="attendance-card">
+                <h3>{{ semestre }}</h3>
+
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th class="center">Nombre de Présences</th>
+                            <th class="center">📊</th>
+                            <th class="center">Nombre d'Absences</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in attendance %}
+                        <tr>
+                            <td>{{ row.module }}</td>
+                            <td class="center presence-count">{{ row.presences }}</td>
+                            <td class="center">
+                                <div class="bar-visual">
+                                    {% for i in range([row.presences, 10] | min) %}
+                                    <div class="bar-seg present" data-height="{{ 8 + i }}"></div>
+                                    {% endfor %}
+                                    {% for i in range([row.absences, 5] | min) %}
+                                    <div class="bar-seg absent" data-height="{{ 6 + i * 2 }}"></div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="center absence-count">{{ row.absences }}</td>
+                        </tr>
+                        {% endfor %}
+
+                        <tr class="total-row">
+                            <td>Total</td>
+                            <td class="center">{{ total_presences }}</td>
+                            <td></td>
+                            <td class="center">{{ total_absences }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('.bar-seg').forEach(function(bar) {
+            const hauteur = bar.getAttribute('data-height');
+            bar.style.height = hauteur + 'px';
+        });
+    </script>
+</body>
+
+</html>

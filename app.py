@@ -1,6 +1,8 @@
 from flask import Flask, render_template, session, redirect, url_for, request
 import sqlite3
 from translations import TRANSLATIONS
+import random
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -148,7 +150,32 @@ def grade_entry():
 def dashboard_admin():
     if session.get('user_role') != 'admin':
         return redirect(url_for('login'))
-    return "Dashboard admin à venir"
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    curseur.execute("SELECT COUNT(*) FROM users WHERE role = 'etudiant'")
+    total_etudiants = curseur.fetchone()[0]
+
+    curseur.execute("SELECT COUNT(*) FROM users WHERE role = 'enseignant'")
+    total_enseignants = curseur.fetchone()[0]
+
+    curseur.execute("SELECT COUNT(DISTINCT classe) FROM users WHERE role = 'etudiant' AND classe IS NOT NULL")
+    total_classes = curseur.fetchone()[0]
+
+    curseur.execute("SELECT AVG((cc_grade + exam_grade) / 2) FROM notes WHERE cc_grade IS NOT NULL AND exam_grade IS NOT NULL")
+    moyenne_generale = curseur.fetchone()[0]
+
+    connexion.close()
+
+    return render_template(
+        'dashboard_admin.html',
+        nom=session.get('user_nom'),
+        total_etudiants=total_etudiants,
+        total_enseignants=total_enseignants,
+        total_classes=total_classes,
+        moyenne_generale=round(moyenne_generale, 2) if moyenne_generale else 0
+    )
 import random
 from datetime import datetime, timedelta
 
@@ -232,5 +259,41 @@ def reset_password():
         return redirect(url_for('login'))
 
     return render_template('reset_password.html', t=t, lang=lang)
+@app.route('/attendance-etudiant')
+def attendance_etudiant():
+    if session.get('user_role') != 'etudiant':
+        return redirect(url_for('login'))
+
+    etudiant_id = session.get('user_id')
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+    curseur.execute(
+        'SELECT module, semestre, presences, absences FROM attendance WHERE etudiant_id = ? ORDER BY module',
+        (etudiant_id,)
+    )
+    rows = curseur.fetchall()
+    connexion.close()
+
+    attendance = [
+        {'module': r[0], 'semestre': r[1], 'presences': r[2], 'absences': r[3]}
+        for r in rows
+    ]
+
+    total_presences = sum(r['presences'] for r in attendance)
+    total_absences  = sum(r['absences']  for r in attendance)
+    total_seances   = total_presences + total_absences
+    semestre        = attendance[0]['semestre'] if attendance else 'Semestre 1'
+
+    return render_template(
+        'attendance_etudiant.html',
+        nom=session.get('user_nom'),
+        attendance=attendance,
+        total_presences=total_presences,
+        total_absences=total_absences,
+        total_seances=total_seances,
+        semestre=semestre
+    )
+
 if __name__ == '__main__':
     app.run(debug=True)
