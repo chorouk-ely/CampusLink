@@ -10,7 +10,10 @@ curseur.execute('''
         email TEXT NOT NULL UNIQUE,
         mot_de_passe TEXT NOT NULL,
         role TEXT NOT NULL,
-        classe TEXT
+        classe TEXT,
+        cne TEXT,
+        cin TEXT,
+        photo TEXT
     )
 ''')
 
@@ -59,6 +62,61 @@ curseur.execute('''
         presences INTEGER DEFAULT 0,
         absences INTEGER DEFAULT 0,
         FOREIGN KEY (etudiant_id) REFERENCES users (id)
+    )
+''')
+curseur.execute('''
+    CREATE TABLE IF NOT EXISTS departments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL UNIQUE
+    )
+''')
+
+curseur.execute('''
+    CREATE TABLE IF NOT EXISTS filieres (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        department_id INTEGER NOT NULL,
+        FOREIGN KEY (department_id) REFERENCES departments (id)
+    )
+''')
+
+curseur.execute('''
+    CREATE TABLE IF NOT EXISTS annees (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        filiere_id INTEGER NOT NULL,
+        FOREIGN KEY (filiere_id) REFERENCES filieres (id)
+    )
+''')
+
+curseur.execute('''
+    CREATE TABLE IF NOT EXISTS semestres (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        annee_id INTEGER NOT NULL,
+        FOREIGN KEY (annee_id) REFERENCES annees (id)
+    )
+''')
+
+curseur.execute('''
+    CREATE TABLE IF NOT EXISTS modules_academiques (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        code TEXT,
+        semestre_id INTEGER NOT NULL,
+        FOREIGN KEY (semestre_id) REFERENCES semestres (id)
+    )
+''')
+
+curseur.execute('''
+    CREATE TABLE IF NOT EXISTS matieres (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        coefficient REAL DEFAULT 1,
+        module_id INTEGER NOT NULL,
+        enseignant_id INTEGER,
+        FOREIGN KEY (module_id) REFERENCES modules_academiques (id),
+        FOREIGN KEY (enseignant_id) REFERENCES users (id)
     )
 ''')
 

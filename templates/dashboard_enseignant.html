@@ -10,7 +10,7 @@
 
     <aside class="sidebar">
         <div class="sidebar-profile">
-            <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar">
+            <img src="{{ url_for('static', filename='uploads/' + photo) if photo != 'avatar.png' else url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
         </div>
         <nav class="sidebar-nav">
             <a href="{{ url_for('dashboard_enseignant') }}" class="nav-item active">🏠 Dashboard</a>

@@ -1,5 +1,171 @@
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h2 {
+    font-size: 26px;
+    color: #1a1a1a;
+}
+
 .topbar-right {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+/* FORM CARD */
+.form-card {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.form-card h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-card label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: #444;
+    margin-top: 16px;
+    margin-bottom: 6px;
+}
+
+.form-card input[type="text"],
+.form-card textarea,
+.form-card select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.form-card input[type="text"]:focus,
+.form-card textarea:focus,
+.form-card select:focus {
+    outline: none;
+    border-color: #2ebd85;
+}
+
+.btn-submit-small {
+    background-color: #2ebd85;
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-submit-small:hover {
+    background-color: #25a374;
+}
+
+/* TABLE */
+.grades-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.grades-table thead th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.grades-table tbody td {
+    padding: 16px;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.grades-table tbody tr:hover {
+    background-color: #fafbfc;
+}
+
+.announcement-title {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.announcement-date {
+    color: #888;
+    font-size: 13px;
+}
+
+/* BUTTONS */
+.btn-edit, .btn-delete {
+    display: inline-block;
+    padding: 7px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 8px;
+    transition: opacity 0.2s;
+}
+
+.btn-edit {
+    background-color: #eef0f3;
+    color: #333;
+}
+
+.btn-edit:hover {
+    opacity: 0.8;
+}
+
+.btn-delete {
+    background-color: #fde8e6;
+    color: #e74c3c;
+}
+
+.btn-delete:hover {
+    opacity: 0.8;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+.role-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.role-tab {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: white;
+    color: #444;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.role-tab-active {
+    background-color: #2ebd85;
+    color: white;
 }

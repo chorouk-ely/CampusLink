@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier l'annonce</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <span class="logo-icon">🎓</span>
+            <div><strong>CampusLink</strong><br>SUPMTI</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard_admin') }}" class="nav-item">Dashboard</a>
+            <a href="{{ url_for('admin_announcements') }}" class="nav-item active"> Announcements </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2>Modifier l'annonce</h2>
+        </header>
+
+        <div class="form-card" style="max-width: 600px;">
+            <form method="POST">
+                <label>Titre</label>
+                <input type="text" name="titre" value="{{ annonce[1] }}" required>
+
+                <label>Contenu</label>
+                <textarea name="contenu" rows="4" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px;">{{ annonce[2] }}</textarea>
+
+                <button type="submit" class="btn-submit-small" style="margin-top: 15px;">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>
