@@ -955,9 +955,6 @@ def admin_appeals():
         messages=messages,
         statut_filtre=statut_filtre
     )
-    @app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
+    
 if __name__ == '__main__':
     app.run(debug=True)
