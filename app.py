@@ -3,10 +3,13 @@ import sqlite3
 from translations import TRANSLATIONS
 import random
 from datetime import datetime, timedelta
+import os
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
 app.secret_key = 'cle-secrete-a-changer-plus-tard'
+UPLOAD_FOLDER = 'static/uploads'
 
 @app.route('/')
 def home():
@@ -66,14 +69,30 @@ def login():
 def dashboard_etudiant():
     if session.get('user_role') != 'etudiant':
         return redirect(url_for('login'))
-    return render_template('dashboard_etudiant.html', nom=session.get('user_nom'))
 
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+    curseur.execute("SELECT photo FROM users WHERE id = ?", (session.get('user_id'),))
+    resultat = curseur.fetchone()
+    connexion.close()
 
+    photo = resultat[0] if resultat and resultat[0] else 'avatar.png'
+
+    return render_template('dashboard_etudiant.html', nom=session.get('user_nom'), photo=photo)
 @app.route('/dashboard-enseignant')
 def dashboard_enseignant():
     if session.get('user_role') != 'enseignant':
         return redirect(url_for('login'))
-    return render_template('dashboard_enseignant.html', nom=session.get('user_nom'))
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+    curseur.execute("SELECT photo FROM users WHERE id = ?", (session.get('user_id'),))
+    resultat = curseur.fetchone()
+    connexion.close()
+
+    photo = resultat[0] if resultat and resultat[0] else 'avatar.png'
+
+    return render_template('dashboard_enseignant.html', nom=session.get('user_nom'), photo=photo)
 
 
 @app.route('/grade-entry', methods=['GET', 'POST'])
@@ -165,6 +184,11 @@ def dashboard_admin():
 
     curseur.execute("SELECT AVG((cc_grade + exam_grade) / 2) FROM notes WHERE cc_grade IS NOT NULL AND exam_grade IS NOT NULL")
     moyenne_generale = curseur.fetchone()[0]
+    curseur.execute("SELECT photo FROM users WHERE id = ?", (session.get('user_id'),))
+    resultat = curseur.fetchone()
+    connexion.close()
+
+    photo = resultat[0] if resultat and resultat[0] else 'avatar.png'
 
     connexion.close()
 
@@ -174,11 +198,10 @@ def dashboard_admin():
         total_etudiants=total_etudiants,
         total_enseignants=total_enseignants,
         total_classes=total_classes,
+        photo=photo,
         moyenne_generale=round(moyenne_generale, 2) if moyenne_generale else 0
+        
     )
-import random
-from datetime import datetime, timedelta
-
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     lang = session.get('lang', 'fr')
@@ -597,6 +620,344 @@ def settings_enseignant():
         success=success,
         erreur=erreur
     )
+@app.route('/admin/announcements', methods=['GET', 'POST'])
+def admin_announcements():
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
 
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    if request.method == 'POST':
+        titre = request.form.get('titre')
+        contenu = request.form.get('contenu')
+        date_publication = datetime.now().strftime('%Y-%m-%d')
+
+        curseur.execute(
+            "INSERT INTO annonces (titre, contenu, date_publication, archivee) VALUES (?, ?, ?, 0)",
+            (titre, contenu, date_publication)
+        )
+        connexion.commit()
+
+    curseur.execute("SELECT id, titre, contenu, date_publication, archivee FROM annonces ORDER BY date_publication DESC")
+    annonces = curseur.fetchall()
+    connexion.close()
+
+    return render_template('admin_announcements.html', nom=session.get('user_nom'), annonces=annonces)
+
+
+@app.route('/admin/announcements/edit/<int:annonce_id>', methods=['GET', 'POST'])
+def edit_announcement(annonce_id):
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    if request.method == 'POST':
+        titre = request.form.get('titre')
+        contenu = request.form.get('contenu')
+
+        curseur.execute(
+            "UPDATE annonces SET titre = ?, contenu = ? WHERE id = ?",
+            (titre, contenu, annonce_id)
+        )
+        connexion.commit()
+        connexion.close()
+        return redirect(url_for('admin_announcements'))
+
+    curseur.execute("SELECT id, titre, contenu FROM annonces WHERE id = ?", (annonce_id,))
+    annonce = curseur.fetchone()
+    connexion.close()
+
+    return render_template('edit_announcement.html', nom=session.get('user_nom'), annonce=annonce)
+
+
+@app.route('/admin/announcements/delete/<int:annonce_id>')
+def delete_announcement(annonce_id):
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+    curseur.execute("DELETE FROM annonces WHERE id = ?", (annonce_id,))
+    connexion.commit()
+    connexion.close()
+
+    return redirect(url_for('admin_announcements'))
+
+@app.route('/admin/academic-structure', methods=['GET', 'POST'])
+def academic_structure():
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    if request.method == 'POST':
+        type_form = request.form.get('type_form')
+
+        if type_form == 'department':
+            curseur.execute("INSERT INTO departments (nom) VALUES (?)", (request.form.get('nom'),))
+
+        elif type_form == 'filiere':
+            curseur.execute(
+                "INSERT INTO filieres (nom, department_id) VALUES (?, ?)",
+                (request.form.get('nom'), request.form.get('department_id'))
+            )
+
+        elif type_form == 'annee':
+            curseur.execute(
+                "INSERT INTO annees (nom, filiere_id) VALUES (?, ?)",
+                (request.form.get('nom'), request.form.get('filiere_id'))
+            )
+
+        elif type_form == 'semestre':
+            curseur.execute(
+                "INSERT INTO semestres (nom, annee_id) VALUES (?, ?)",
+                (request.form.get('nom'), request.form.get('annee_id'))
+            )
+
+        elif type_form == 'module':
+            curseur.execute(
+                "INSERT INTO modules_academiques (nom, code, semestre_id) VALUES (?, ?, ?)",
+                (request.form.get('nom'), request.form.get('code'), request.form.get('semestre_id'))
+            )
+
+        elif type_form == 'matiere':
+            curseur.execute(
+                "INSERT INTO matieres (nom, coefficient, module_id, enseignant_id) VALUES (?, ?, ?, ?)",
+                (request.form.get('nom'), request.form.get('coefficient'), request.form.get('module_id'), request.form.get('enseignant_id') or None)
+            )
+
+        connexion.commit()
+
+        return redirect(url_for('academic_structure',
+            department_id=request.form.get('keep_department_id') or None,
+            filiere_id=request.form.get('keep_filiere_id') or None,
+            annee_id=request.form.get('keep_annee_id') or None,
+            semestre_id=request.form.get('keep_semestre_id') or None,
+            module_id=request.form.get('keep_module_id') or None
+        ))
+
+    department_id = request.args.get('department_id', type=int)
+    filiere_id = request.args.get('filiere_id', type=int)
+    annee_id = request.args.get('annee_id', type=int)
+    semestre_id = request.args.get('semestre_id', type=int)
+    module_id = request.args.get('module_id', type=int)
+
+    curseur.execute("SELECT id, nom FROM departments ORDER BY nom")
+    departments = curseur.fetchall()
+
+    filieres = []
+    if department_id:
+        curseur.execute("SELECT id, nom FROM filieres WHERE department_id = ? ORDER BY nom", (department_id,))
+        filieres = curseur.fetchall()
+
+    annees = []
+    if filiere_id:
+        curseur.execute("SELECT id, nom FROM annees WHERE filiere_id = ? ORDER BY nom", (filiere_id,))
+        annees = curseur.fetchall()
+
+    semestres = []
+    if annee_id:
+        curseur.execute("SELECT id, nom FROM semestres WHERE annee_id = ? ORDER BY nom", (annee_id,))
+        semestres = curseur.fetchall()
+
+    modules = []
+    if semestre_id:
+        curseur.execute("SELECT id, nom, code FROM modules_academiques WHERE semestre_id = ? ORDER BY nom", (semestre_id,))
+        modules = curseur.fetchall()
+
+    matieres = []
+    if module_id:
+        curseur.execute('''
+            SELECT matieres.id, matieres.nom, matieres.coefficient, users.nom
+            FROM matieres
+            LEFT JOIN users ON matieres.enseignant_id = users.id
+            WHERE matieres.module_id = ?
+        ''', (module_id,))
+        matieres = curseur.fetchall()
+
+    curseur.execute("SELECT id, nom FROM users WHERE role = 'enseignant'")
+    enseignants = curseur.fetchall()
+
+    connexion.close()
+
+    return render_template(
+        'academic_structure.html',
+        nom=session.get('user_nom'),
+        departments=departments, filieres=filieres, annees=annees,
+        semestres=semestres, modules=modules, matieres=matieres,
+        enseignants=enseignants,
+        department_id=department_id, filiere_id=filiere_id, annee_id=annee_id,
+        semestre_id=semestre_id, module_id=module_id
+    )
+@app.route('/admin/users')
+def user_management():
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    role_choisi = request.args.get('role')
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    utilisateurs = []
+    if role_choisi:
+        curseur.execute("SELECT id, nom, email, classe FROM users WHERE role = ?", (role_choisi,))
+        utilisateurs = curseur.fetchall()
+
+    connexion.close()
+
+    return render_template('user_management.html', nom=session.get('user_nom'), role_choisi=role_choisi, utilisateurs=utilisateurs)
+
+
+@app.route('/admin/users/add', methods=['POST'])
+def add_user():
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    nom = request.form.get('nom')
+    email = request.form.get('email')
+    mot_de_passe = request.form.get('mot_de_passe')
+    role = request.form.get('role')
+    classe = request.form.get('classe') or None
+    cne = request.form.get('cne') or None
+    cin = request.form.get('cin') or None
+
+    photo_filename = None
+    photo_file = request.files.get('photo')
+    if photo_file and photo_file.filename != '':
+        photo_filename = secure_filename(photo_file.filename)
+        photo_file.save(os.path.join(UPLOAD_FOLDER, photo_filename))
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+    try:
+        curseur.execute(
+            "INSERT INTO users (nom, email, mot_de_passe, role, classe, cne, cin, photo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (nom, email, mot_de_passe, role, classe, cne, cin, photo_filename)
+        )
+        connexion.commit()
+    except sqlite3.IntegrityError:
+        pass
+    connexion.close()
+
+    return redirect(url_for('user_management', role=role))
+
+
+@app.route('/admin/users/edit/<int:user_id>', methods=['GET', 'POST'])
+def edit_user(user_id):
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    if request.method == 'POST':
+        nom = request.form.get('nom')
+        email = request.form.get('email')
+        classe = request.form.get('classe') or None
+
+        curseur.execute(
+            "UPDATE users SET nom = ?, email = ?, classe = ? WHERE id = ?",
+            (nom, email, classe, user_id)
+        )
+        connexion.commit()
+
+        curseur.execute("SELECT role FROM users WHERE id = ?", (user_id,))
+        role = curseur.fetchone()[0]
+        connexion.close()
+        return redirect(url_for('user_management', role=role))
+
+    curseur.execute("SELECT id, nom, email, role, classe FROM users WHERE id = ?", (user_id,))
+    utilisateur = curseur.fetchone()
+    connexion.close()
+
+    return render_template('edit_user.html', nom=session.get('user_nom'), utilisateur=utilisateur)
+
+
+@app.route('/admin/users/delete/<int:user_id>')
+def delete_user(user_id):
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    curseur.execute("SELECT role FROM users WHERE id = ?", (user_id,))
+    resultat = curseur.fetchone()
+    role = resultat[0] if resultat else None
+
+    curseur.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    connexion.commit()
+    connexion.close()
+
+    return redirect(url_for('user_management', role=role))
+@app.route('/settings-admin', methods=['GET', 'POST'])
+def settings_admin():
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    success, erreur = False, None
+
+    if request.method == 'POST':
+        success, erreur = changer_mot_de_passe(session.get('user_id'))
+
+    return render_template(
+        'settings.html',
+        nom=session.get('user_nom'),
+        role='admin',
+        success=success,
+        erreur=erreur
+    )
+@app.route('/admin/appeals')
+def admin_appeals():
+    if session.get('user_role') != 'admin':
+        return redirect(url_for('login'))
+
+    statut_filtre = request.args.get('statut')
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+
+    requete = '''
+        SELECT messages.id, etu.nom, ens.nom, messages.contenu,
+               messages.reponse, messages.statut, messages.date_envoi
+        FROM messages
+        JOIN users AS etu ON etu.id = messages.etudiant_id
+        JOIN users AS ens ON ens.id = messages.enseignant_id
+    '''
+    params = ()
+
+    if statut_filtre:
+        requete += " WHERE messages.statut = ?"
+        params = (statut_filtre,)
+
+    requete += " ORDER BY messages.date_envoi DESC"
+
+    curseur.execute(requete, params)
+    rows = curseur.fetchall()
+    connexion.close()
+
+    messages = [
+        {
+            'id': r[0], 'etudiant': r[1], 'enseignant': r[2],
+            'contenu': r[3], 'reponse': r[4], 'statut': r[5], 'date': r[6]
+        }
+        for r in rows
+    ]
+
+    return render_template(
+        'admin_appeals.html',
+        nom=session.get('user_nom'),
+        messages=messages,
+        statut_filtre=statut_filtre
+    )
+    @app.route('/logout')
+    def logout():
+        session.clear()
+        return redirect(url_for('login'))
 if __name__ == '__main__':
     app.run(debug=True)

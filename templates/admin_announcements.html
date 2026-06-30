@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CampusLink - Announcements</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <span class="logo-icon">🎓</span>
+            <div><strong>CampusLink</strong><br>SUPMTI</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard_admin') }}" class="nav-item">Dashboard</a>
+            <a href="{{ url_for('admin_announcements') }}" class="nav-item active"> Announcements (CRUD)</a>
+            <a href="{{ url_for('academic_structure') }}" class="nav-item">Academic Structuring</a>
+            <a href="{{ url_for('user_management') }}" class="nav-item"> User Management</a>
+            <a href="{{ url_for('admin_appeals') }}" class="nav-item"> Grade Appeals & Litiges</a>
+            <a href="#" class="nav-item"> Audit Logs</a>
+            <a href="{{ url_for('settings_admin') }}" class="nav-item"> System Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar page-header">
+            <h2> Gestion des Annonces</h2>
+        </header>
+
+        <div class="form-card" style="max-width: 600px;">
+            <h3>➕ Ajouter une annonce</h3>
+            <form method="POST">
+                <label>Titre</label>
+                <input type="text" name="titre" placeholder="Ex: Examens du Semestre 2" required>
+
+                <label>Contenu</label>
+                <textarea name="contenu" rows="4" placeholder="Détails de l'annonce..." required></textarea>
+
+                <button type="submit" class="btn-submit-small" style="margin-top: 18px;">Publier</button>
+            </form>
+        </div>
+
+        <div class="form-card" style="max-width: 100%;">
+            <h3> Annonces existantes</h3>
+
+            {% if annonces %}
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Contenu</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for annonce in annonces %}
+                    <tr>
+                        <td class="announcement-title">{{ annonce[1] }}</td>
+                        <td>{{ annonce[2][:60] }}{% if annonce[2]|length > 60 %}...{% endif %}</td>
+                        <td class="announcement-date">{{ annonce[3] }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_announcement', annonce_id=annonce[0]) }}" class="btn-edit">✏️ Modifier</a>
+                            <a href="{{ url_for('delete_announcement', annonce_id=annonce[0]) }}" class="btn-delete" onclick="return confirm('Supprimer cette annonce ?');">🗑️ Supprimer</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">Aucune annonce pour le moment.</div>
+            {% endif %}
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

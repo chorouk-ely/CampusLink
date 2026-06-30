@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Paramètres</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <span class="logo-icon">🎓</span>
+            <div><strong>CampusLink</strong><br>SUPMTI</div>
+        </div>
+        <nav class="sidebar-nav">
+            {% if role == 'admin' %}
+                <a href="{{ url_for('dashboard_admin') }}" class="nav-item">Dashboard</a>
+                <a href="{{ url_for('admin_announcements') }}" class="nav-item"> Announcements (CRUD)</a>
+                <a href="{{ url_for('academic_structure') }}" class="nav-item"> Academic Structuring</a>
+                <a href="{{ url_for('user_management') }}" class="nav-item">User Management</a>
+                <a href="#" class="nav-item"> Grade Appeals & Litiges</a>
+                <a href="{{ url_for('settings_admin') }}" class="nav-item active"> System Settings</a>
+            {% elif role == 'enseignant' %}
+                <a href="{{ url_for('dashboard_enseignant') }}" class="nav-item"> Dashboard</a>
+                <a href="{{ url_for('grade_entry') }}" class="nav-item"> Grade Entry</a>
+                <a href="#" class="nav-item"> Appeals</a>
+                <a href="{{ url_for('settings') }}" class="nav-item active">⚙️ Settings</a>
+            {% else %}
+                <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item">🏠 Dashboard</a>
+                <a href="#" class="nav-item">📊 My Grades</a>
+                <a href="{{ url_for('attendance_etudiant') }}" class="nav-item">📅 Attendance</a>
+                <a href="#" class="nav-item">📄 Documents</a>
+                <a href="#" class="nav-item">👤 My Profile</a>
+                <a href="#" class="nav-item">💬 Send Appeal to Teacher</a>
+                <a href="{{ url_for('settings') }}" class="nav-item active">⚙️ Settings</a>
+            {% endif %}
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar page-header">
+            <h2>⚙️ Changer le mot de passe</h2>
+        </header>
+
+        <div class="form-card" style="max-width: 500px;">
+
+            {% if erreur %}
+            <p style="color: #e74c3c; margin-bottom: 15px;">{{ erreur }}</p>
+            {% endif %}
+
+            {% if succes %}
+            <p style="color: #2ebd85; margin-bottom: 15px;">{{ succes }}</p>
+            {% endif %}
+
+            <form method="POST">
+                <label>Mot de passe actuel</label>
+                <input type="password" name="ancien_mdp" required>
+
+                <label>Nouveau mot de passe</label>
+                <input type="password" name="nouveau_mdp" required>
+
+                <label>Confirmer le nouveau mot de passe</label>
+                <input type="password" name="confirmer_mdp" required>
+
+                <button type="submit" class="btn-submit-small" style="margin-top: 18px;">Mettre à jour</button>
+            </form>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

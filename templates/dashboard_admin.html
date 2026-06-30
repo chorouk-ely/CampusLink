@@ -11,17 +11,17 @@
 
     <aside class="sidebar">
         <div class="sidebar-profile">
+            <img src="{{ url_for('static', filename='uploads/' + photo) if photo != 'avatar.png' else url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
             <span class="logo-icon">🎓</span>
             <div><strong>CampusLink</strong><br>SUPMTI</div>
         </div>
         <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard_admin') }}" class="nav-item active">🏠 Dashboard</a>
-            <a href="#" class="nav-item">📢 Announcements (CRUD)</a>
-            <a href="#" class="nav-item">📚 Academic Structuring</a>
-            <a href="#" class="nav-item">👥 User Management</a>
-            <a href="#" class="nav-item">⚖️ Grade Appeals & Litiges</a>
-            <a href="#" class="nav-item">🧾 Audit Logs</a>
-            <a href="#" class="nav-item">⚙️ System Settings</a>
+            <a href="{{ url_for('dashboard_admin') }}" class="nav-item active"> Dashboard</a>
+            <a href="{{ url_for('admin_announcements') }}" class="nav-item">Announcements </a>
+            <a href="{{ url_for('academic_structure') }}" class="nav-item"> Academic Structuring</a>
+            <a href="{{ url_for('user_management') }}" class="nav-item"> User Management</a>
+            <a href="{{ url_for('admin_appeals') }}" class="nav-item"> Grade Appeals & Litiges</a>
+            <a href="{{ url_for('settings_admin') }}" class="nav-item"> System Settings</a>
         </nav>
     </aside>
 

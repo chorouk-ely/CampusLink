@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <span class="logo-icon">🎓</span>
+            <div><strong>CampusLink</strong><br>SUPMTI</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard_admin') }}" class="nav-item">🏠 Dashboard</a>
+            <a href="{{ url_for('admin_announcements') }}" class="nav-item">📢 Announcements (CRUD)</a>
+            <a href="{{ url_for('academic_structure') }}" class="nav-item">📚 Academic Structuring</a>
+            <a href="{{ url_for('user_management') }}" class="nav-item active">👥 User Management</a>
+            <a href="{{ url_for('admin_appeals') }}" class="nav-item">⚖️ Grade Appeals & Litiges</a>
+            <a href="#" class="nav-item">🧾 Audit Logs</a>
+            <a href="#" class="nav-item">⚙️ System Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar page-header">
+            <h2>👥 Gestion des Utilisateurs</h2>
+        </header>
+
+        <!-- CHOIX DU ROLE -->
+        <div class="role-tabs">
+            <a href="{{ url_for('user_management', role='etudiant') }}" class="role-tab {{ 'role-tab-active' if role_choisi == 'etudiant' else '' }}">🎓 Étudiants</a>
+            <a href="{{ url_for('user_management', role='enseignant') }}" class="role-tab {{ 'role-tab-active' if role_choisi == 'enseignant' else '' }}">👨‍🏫 Enseignants</a>
+            <a href="{{ url_for('user_management', role='admin') }}" class="role-tab {{ 'role-tab-active' if role_choisi == 'admin' else '' }}">🛡️ Admins</a>
+        </div>
+
+        {% if role_choisi %}
+
+        <div class="form-card" style="max-width: 600px;">
+            <h3>➕ Ajouter {{ 'un étudiant' if role_choisi == 'etudiant' else ('un enseignant' if role_choisi == 'enseignant' else 'un admin') }}</h3>
+            <form method="POST" action="{{ url_for('add_user') }}" enctype="multipart/form-data">
+                <input type="hidden" name="role" value="{{ role_choisi }}">
+
+                <label>Nom complet</label>
+                <input type="text" name="nom" required>
+
+                <label>Email</label>
+                <input type="text" name="email" required>
+
+                <label>Mot de passe</label>
+                <input type="text" name="mot_de_passe" required>
+                <label>CNE</label>
+                <input type="text" name="cne">
+
+                <label>CIN</label>
+                <input type="text" name="cin">
+
+                <label>Photo de profil</label>
+                <input type="file" name="photo" accept="image/*">
+
+                {% if role_choisi == 'etudiant' %}
+                <label>Classe</label>
+                <input type="text" name="classe" placeholder="Ex: GI-Ann3">
+                {% endif %}
+
+                <button type="submit" class="btn-submit-small" style="margin-top: 18px;">Ajouter</button>
+            </form>
+        </div>
+
+        <div class="form-card" style="max-width: 100%;">
+            <h3>📋 Liste</h3>
+
+            {% if utilisateurs %}
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        {% if role_choisi == 'etudiant' %}<th>Classe</th>{% endif %}
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in utilisateurs %}
+                    <tr>
+                        <td class="announcement-title">{{ u[1] }}</td>
+                        <td>{{ u[2] }}</td>
+                        {% if role_choisi == 'etudiant' %}<td>{{ u[3] or '--' }}</td>{% endif %}
+                        <td>
+                            <a href="{{ url_for('edit_user', user_id=u[0]) }}" class="btn-edit">✏️ Modifier</a>
+                            <a href="{{ url_for('delete_user', user_id=u[0]) }}" class="btn-delete" onclick="return confirm('Supprimer cet utilisateur ?');">🗑️ Supprimer</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">Aucun utilisateur dans cette catégorie.</div>
+            {% endif %}
+        </div>
+
+        {% endif %}
+    </main>
+
+</div>
+</body>
+</html>
