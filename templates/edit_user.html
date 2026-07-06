@@ -1,52 +1,26 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Modifier l'utilisateur</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-</head>
-<body>
-<div class="dashboard-layout">
+{% extends "base.html" %}
+{% block title %}Modifier l'utilisateur{% endblock %}
+{% block page_header %}Modifier l'utilisateur{% endblock %}
 
-    <aside class="sidebar">
-        <div class="sidebar-profile">
-            <span class="logo-icon">🎓</span>
-            <div><strong>CampusLink</strong><br>SUPMTI</div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard_admin') }}" class="nav-item"> Dashboard</a>
-            <a href="{{ url_for('admin_announcements') }}" class="nav-item"> Announcements </a>
-            <a href="{{ url_for('academic_structure') }}" class="nav-item">Academic Structuring</a>
-            <a href="{{ url_for('user_management') }}" class="nav-item active"> User Management</a>
-            <a href="{{ url_for('admin_appeals') }}" class="nav-item"> Grade Appeals & Litiges</a>
-            <a href="{{ url_for('settings_admin') }}" class="nav-item">System Settings</a>
-        </nav>
-    </aside>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
 
-    <main class="main-content">
-        <header class="topbar page-header">
-            <h2>Modifier l'utilisateur</h2>
-        </header>
+{% block content %}
+<div class="form-card" style="max-width: 600px;">
+    <form method="POST">
+        <label>Nom complet</label>
+        <input type="text" name="nom" value="{{ utilisateur[1] }}" required>
 
-        <div class="form-card" style="max-width: 600px;">
-            <form method="POST">
-                <label>Nom complet</label>
-                <input type="text" name="nom" value="{{ utilisateur[1] }}" required>
+        <label>Email</label>
+        <input type="text" name="email" value="{{ utilisateur[2] }}" required>
 
-                <label>Email</label>
-                <input type="text" name="email" value="{{ utilisateur[2] }}" required>
+        {% if utilisateur[3] == 'etudiant' %}
+        <label>Classe</label>
+        <input type="text" name="classe" value="{{ utilisateur[4] or '' }}">
+        {% endif %}
 
-                {% if utilisateur[3] == 'etudiant' %}
-                <label>Classe</label>
-                <input type="text" name="classe" value="{{ utilisateur[4] or '' }}">
-                {% endif %}
-
-                <button type="submit" class="btn-submit-small" style="margin-top: 18px;">Enregistrer</button>
-            </form>
-        </div>
-    </main>
-
+        <button type="submit" class="btn-submit-small" style="margin-top: 18px;">Enregistrer</button>
+    </form>
 </div>
-</body>
-</html>
+{% endblock %}

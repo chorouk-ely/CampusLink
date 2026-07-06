@@ -1,52 +1,20 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>CampusLink - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-</head>
-<body>
-<div class="dashboard-layout">
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_header %}Welcome back, {{ current_nom }}{% endblock %}
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-profile">
-            <img src="{{ url_for('static', filename='uploads/' + photo) if photo != 'avatar.png' else url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
-        </div>
-        <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item active">🏠 Dashboard</a>
-            <a href="{{ url_for('grades_etudiant') }}" class="nav-item">📊 My Grades</a>
-            <a href="{{ url_for('attendance_etudiant') }}" class="nav-item">📅 Attendance</a>
-            <a href="{{ url_for('send_appeal') }}" class="nav-item">💬 Send Appeal to Teacher</a>
-            <a href="{{ url_for('settings_etudiant') }}" class="nav-item">⚙️ Settings</a>
-        </nav>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-        <header class="topbar">
-            <h2>Welcome back, {{ nom }}!</h2>
-            <div class="topbar-right">
-                <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
-            </div>
-        </header>
-
-        <div class="stats-cards">
-            <div class="stat-card">
-                <p class="stat-label">Overall GPA</p>
-                <h2>-- / 20</h2>
-            </div>
-            <div class="stat-card">
-                <p class="stat-label">Attendance</p>
-                <h2>-- %</h2>
-            </div>
-            <div class="stat-card">
-                <p class="stat-label">Last 5 Grades</p>
-                <p>À venir</p>
-            </div>
-        </div>
-    </main>
-
+{% block content %}
+<div class="stats-cards">
+    <div class="stat-card">
+        <p class="stat-label">Overall GPA</p>
+        <h2>-- / 20</h2>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Attendance</p>
+        <h2>-- %</h2>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Last 5 Grades</p>
+        <p>A venir</p>
+    </div>
 </div>
-</body>
-</html>
+{% endblock %}

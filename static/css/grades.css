@@ -154,3 +154,16 @@
     background-color: #f0f0f0;
     color: #999;
 }
+.btn-export-pdf {
+    background-color: #e74c3c;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-export-pdf:hover {
+    background-color: #c0392b;
+}

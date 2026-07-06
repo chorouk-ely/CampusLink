@@ -1,80 +1,53 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Academic Structure</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/academic.css') }}">
-</head>
-<body>
-<div class="dashboard-layout">
+{% extends "base.html" %}
+{% block title %}Academic Structure{% endblock %}
+{% block page_header %}Academic Structure: Modules &amp; Coefficients{% endblock %}
 
-    <aside class="sidebar">
-        <div class="sidebar-profile">
-            <span class="logo-icon">🎓</span>
-            <div><strong>CampusLink</strong><br>SUPMTI</div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard_admin') }}" class="nav-item"> Dashboard</a>
-            <a href="{{ url_for('admin_announcements') }}" class="nav-item"> Announcements </a>
-            <a href="{{ url_for('academic_structure') }}" class="nav-item active"> Academic Structuring</a>
-            <a href="{{ url_for('user_management') }}" class="nav-item"> User Management</a>
-            <a href="{{ url_for('admin_appeals') }}" class="nav-item"> Grade Appeals & Litiges</a>
-            <a href="#" class="nav-item"> Audit Logs</a>
-            <a href="{{ url_for('settings_admin') }}" class="nav-item"> System Settings</a>
-        </nav>
-    </aside>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/academic.css') }}">
+{% endblock %}
 
-    <main class="main-content">
-        <header class="topbar page-header">
-            <h2>📚 Academic Structure: Modules & Coefficients</h2>
-        </header>
+{% block content %}
+<div class="structure-grid">
 
-        <div class="structure-grid">
+    <!-- COLONNE 1 : ARBRE -->
+    <div class="structure-col">
+        <h3>Academic Paths</h3>
 
-            <!-- COLONNE 1 : ARBRE -->
-            <div class="structure-col">
-                <h3>Academic Paths</h3>
+        <ul class="tree">
+            {% for dept in departments %}
+            <li>
+                <a href="{{ url_for('academic_structure', department_id=dept[0]) }}"
+                   class="{{ 'tree-active' if dept[0] == department_id else '' }}">
+                   {{ dept[1] }}
+                </a>
 
+                {% if dept[0] == department_id %}
                 <ul class="tree">
-                    {% for dept in departments %}
+                    {% for fil in filieres %}
                     <li>
-                        <a href="{{ url_for('academic_structure', department_id=dept[0]) }}"
-                           class="{{ 'tree-active' if dept[0] == department_id else '' }}">
-                           📁 {{ dept[1] }}
+                        <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=fil[0]) }}"
+                           class="{{ 'tree-active' if fil[0] == filiere_id else '' }}">
+                           {{ fil[1] }}
                         </a>
 
-                        {% if dept[0] == department_id %}
+                        {% if fil[0] == filiere_id %}
                         <ul class="tree">
-                            {% for fil in filieres %}
+                            {% for an in annees %}
                             <li>
-                                <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=fil[0]) }}"
-                                   class="{{ 'tree-active' if fil[0] == filiere_id else '' }}">
-                                   📂 {{ fil[1] }}
+                                <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=filiere_id, annee_id=an[0]) }}"
+                                   class="{{ 'tree-active' if an[0] == annee_id else '' }}">
+                                   {{ an[1] }}
                                 </a>
 
-                                {% if fil[0] == filiere_id %}
+                                {% if an[0] == annee_id %}
                                 <ul class="tree">
-                                    {% for an in annees %}
+                                    {% for sem in semestres %}
                                     <li>
-                                        <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=filiere_id, annee_id=an[0]) }}"
-                                           class="{{ 'tree-active' if an[0] == annee_id else '' }}">
-                                           📁 {{ an[1] }}
+                                        <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=filiere_id, annee_id=annee_id, semestre_id=sem[0]) }}"
+                                           class="{{ 'tree-active' if sem[0] == semestre_id else '' }}">
+                                           {{ sem[1] }}
                                         </a>
-
-                                        {% if an[0] == annee_id %}
-                                        <ul class="tree">
-                                            {% for sem in semestres %}
-                                            <li>
-                                                <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=filiere_id, annee_id=annee_id, semestre_id=sem[0]) }}"
-                                                   class="{{ 'tree-active' if sem[0] == semestre_id else '' }}">
-                                                   📄 {{ sem[1] }}
-                                                </a>
-                                            </li>
-                                            {% endfor %}
-                                        </ul>
-                                        {% endif %}
                                     </li>
                                     {% endfor %}
                                 </ul>
@@ -86,124 +59,123 @@
                     </li>
                     {% endfor %}
                 </ul>
-
-                <hr>
-
-                <!-- Ajout selon le niveau actuel -->
-                <form method="POST" class="mini-form">
-                    <input type="hidden" name="type_form" value="department">
-                    <input type="text" name="nom" placeholder="Nouveau département" required>
-                    <button type="submit">+ Département</button>
-                </form>
-
-                {% if department_id %}
-                <form method="POST" class="mini-form">
-                    <input type="hidden" name="type_form" value="filiere">
-                    <input type="hidden" name="department_id" value="{{ department_id }}">
-                    <input type="hidden" name="keep_department_id" value="{{ department_id }}">
-                    <input type="text" name="nom" placeholder="Nouvelle filière" required>
-                    <button type="submit">+ Filière</button>
-                </form>
                 {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
 
-                {% if filiere_id %}
-                <form method="POST" class="mini-form">
-                    <input type="hidden" name="type_form" value="annee">
-                    <input type="hidden" name="filiere_id" value="{{ filiere_id }}">
-                    <input type="hidden" name="keep_department_id" value="{{ department_id }}">
-                    <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
-                    <input type="text" name="nom" placeholder="Nouvelle année" required>
-                    <button type="submit">+ Année</button>
-                </form>
-                {% endif %}
+        <hr>
 
-                {% if annee_id %}
-                <form method="POST" class="mini-form">
-                    <input type="hidden" name="type_form" value="semestre">
-                    <input type="hidden" name="annee_id" value="{{ annee_id }}">
-                    <input type="hidden" name="keep_department_id" value="{{ department_id }}">
-                    <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
-                    <input type="hidden" name="keep_annee_id" value="{{ annee_id }}">
-                    <input type="text" name="nom" placeholder="Nouveau semestre" required>
-                    <button type="submit">+ Semestre</button>
-                </form>
-                {% endif %}
-            </div>
+        <form method="POST" class="mini-form">
+            <input type="hidden" name="type_form" value="department">
+            <input type="text" name="nom" placeholder="Nouveau departement" required>
+            <button type="submit">+ Departement</button>
+        </form>
 
-            <!-- COLONNE 2 : MODULES -->
-            <div class="structure-col">
-                <h3>Modules</h3>
+        {% if department_id %}
+        <form method="POST" class="mini-form">
+            <input type="hidden" name="type_form" value="filiere">
+            <input type="hidden" name="department_id" value="{{ department_id }}">
+            <input type="hidden" name="keep_department_id" value="{{ department_id }}">
+            <input type="text" name="nom" placeholder="Nouvelle filiere" required>
+            <button type="submit">+ Filiere</button>
+        </form>
+        {% endif %}
 
-                {% if semestre_id %}
-                <ul class="simple-list">
-                    {% for mod in modules %}
-                    <li>
-                        <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=filiere_id, annee_id=annee_id, semestre_id=semestre_id, module_id=mod[0]) }}"
-                           class="{{ 'list-active' if mod[0] == module_id else '' }}">
-                           {{ mod[1] }} <span class="muted">({{ mod[2] }})</span>
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
+        {% if filiere_id %}
+        <form method="POST" class="mini-form">
+            <input type="hidden" name="type_form" value="annee">
+            <input type="hidden" name="filiere_id" value="{{ filiere_id }}">
+            <input type="hidden" name="keep_department_id" value="{{ department_id }}">
+            <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
+            <input type="text" name="nom" placeholder="Nouvelle annee" required>
+            <button type="submit">+ Annee</button>
+        </form>
+        {% endif %}
 
-                <hr>
-                <form method="POST" class="mini-form">
-                    <input type="hidden" name="type_form" value="module">
-                    <input type="hidden" name="semestre_id" value="{{ semestre_id }}">
-                    <input type="hidden" name="keep_department_id" value="{{ department_id }}">
-                    <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
-                    <input type="hidden" name="keep_annee_id" value="{{ annee_id }}">
-                    <input type="hidden" name="keep_semestre_id" value="{{ semestre_id }}">
-                    <input type="text" name="nom" placeholder="Nom du module" required>
-                    <input type="text" name="code" placeholder="Code (ex: DS101)">
-                    <button type="submit">+ Nouveau module</button>
-                </form>
-                {% else %}
-                <p class="muted">Choisis un semestre à gauche.</p>
-                {% endif %}
-            </div>
+        {% if annee_id %}
+        <form method="POST" class="mini-form">
+            <input type="hidden" name="type_form" value="semestre">
+            <input type="hidden" name="annee_id" value="{{ annee_id }}">
+            <input type="hidden" name="keep_department_id" value="{{ department_id }}">
+            <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
+            <input type="hidden" name="keep_annee_id" value="{{ annee_id }}">
+            <input type="text" name="nom" placeholder="Nouveau semestre" required>
+            <button type="submit">+ Semestre</button>
+        </form>
+        {% endif %}
+    </div>
 
-            <!-- COLONNE 3 : DETAILS / MATIERES -->
-            <div class="structure-col">
-                <h3>Details</h3>
+    <!-- COLONNE 2 : MODULES -->
+    <div class="structure-col">
+        <h3>Modules</h3>
 
-                {% if module_id %}
-                <ul class="simple-list">
-                    {% for mat in matieres %}
-                    <li>
-                        {{ mat[1] }} — Coeff {{ mat[2] }}
-                        {% if mat[3] %}<span class="muted">({{ mat[3] }})</span>{% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
+        {% if semestre_id %}
+        <ul class="simple-list">
+            {% for mod in modules %}
+            <li>
+                <a href="{{ url_for('academic_structure', department_id=department_id, filiere_id=filiere_id, annee_id=annee_id, semestre_id=semestre_id, module_id=mod[0]) }}"
+                   class="{{ 'list-active' if mod[0] == module_id else '' }}">
+                   {{ mod[1] }} <span class="muted">({{ mod[2] }})</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
 
-                <hr>
-                <form method="POST" class="mini-form">
-                    <input type="hidden" name="type_form" value="matiere">
-                    <input type="hidden" name="module_id" value="{{ module_id }}">
-                    <input type="hidden" name="keep_department_id" value="{{ department_id }}">
-                    <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
-                    <input type="hidden" name="keep_annee_id" value="{{ annee_id }}">
-                    <input type="hidden" name="keep_semestre_id" value="{{ semestre_id }}">
-                    <input type="hidden" name="keep_module_id" value="{{ module_id }}">
-                    <input type="text" name="nom" placeholder="Nom de la matière" required>
-                    <input type="number" step="0.1" name="coefficient" placeholder="Coefficient" value="1">
-                    <select name="enseignant_id">
-                        <option value="">-- Professeur (optionnel) --</option>
-                        {% for ens in enseignants %}
-                        <option value="{{ ens[0] }}">{{ ens[1] }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit">+ Matière</button>
-                </form>
-                {% else %}
-                <p class="muted">Choisis un module au centre.</p>
-                {% endif %}
-            </div>
+        <hr>
+        <form method="POST" class="mini-form">
+            <input type="hidden" name="type_form" value="module">
+            <input type="hidden" name="semestre_id" value="{{ semestre_id }}">
+            <input type="hidden" name="keep_department_id" value="{{ department_id }}">
+            <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
+            <input type="hidden" name="keep_annee_id" value="{{ annee_id }}">
+            <input type="hidden" name="keep_semestre_id" value="{{ semestre_id }}">
+            <input type="text" name="nom" placeholder="Nom du module" required>
+            <input type="text" name="code" placeholder="Code (ex: DS101)">
+            <button type="submit">+ Nouveau module</button>
+        </form>
+        {% else %}
+        <p class="muted">Choisis un semestre a gauche.</p>
+        {% endif %}
+    </div>
 
-        </div>
-    </main>
+    <!-- COLONNE 3 : DETAILS / MATIERES -->
+    <div class="structure-col">
+        <h3>Details</h3>
+
+        {% if module_id %}
+        <ul class="simple-list">
+            {% for mat in matieres %}
+            <li>
+                {{ mat[1] }} - Coeff {{ mat[2] }}
+                {% if mat[3] %}<span class="muted">({{ mat[3] }})</span>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <hr>
+        <form method="POST" class="mini-form">
+            <input type="hidden" name="type_form" value="matiere">
+            <input type="hidden" name="module_id" value="{{ module_id }}">
+            <input type="hidden" name="keep_department_id" value="{{ department_id }}">
+            <input type="hidden" name="keep_filiere_id" value="{{ filiere_id }}">
+            <input type="hidden" name="keep_annee_id" value="{{ annee_id }}">
+            <input type="hidden" name="keep_semestre_id" value="{{ semestre_id }}">
+            <input type="hidden" name="keep_module_id" value="{{ module_id }}">
+            <input type="text" name="nom" placeholder="Nom de la matiere" required>
+            <input type="number" step="0.1" name="coefficient" placeholder="Coefficient" value="1">
+            <select name="enseignant_id">
+                <option value="">-- Professeur (optionnel) --</option>
+                {% for ens in enseignants %}
+                <option value="{{ ens[0] }}">{{ ens[1] }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">+ Matiere</button>
+        </form>
+        {% else %}
+        <p class="muted">Choisis un module au centre.</p>
+        {% endif %}
+    </div>
 
 </div>
-</body>
-</html>
+{% endblock %}

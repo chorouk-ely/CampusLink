@@ -1,79 +1,52 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Grade Appeals & Litiges</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-</head>
-<body>
-<div class="dashboard-layout">
+{% extends "base.html" %}
+{% block title %}Grade Appeals &amp; Litiges{% endblock %}
+{% block page_header %}Grade Appeals &amp; Litiges{% endblock %}
 
-    <aside class="sidebar">
-        <div class="sidebar-profile">
-            <span class="logo-icon">🎓</span>
-            <div><strong>CampusLink</strong><br>SUPMTI</div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard_admin') }}" class="nav-item">🏠 Dashboard</a>
-            <a href="{{ url_for('admin_announcements') }}" class="nav-item">📢 Announcements (CRUD)</a>
-            <a href="{{ url_for('academic_structure') }}" class="nav-item">📚 Academic Structuring</a>
-            <a href="{{ url_for('user_management') }}" class="nav-item">👥 User Management</a>
-            <a href="{{ url_for('admin_appeals') }}" class="nav-item active">⚖️ Grade Appeals & Litiges</a>
-            <a href="#" class="nav-item">🧾 Audit Logs</a>
-            <a href="{{ url_for('settings_admin') }}" class="nav-item">⚙️ System Settings</a>
-        </nav>
-    </aside>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
 
-    <main class="main-content">
-        <header class="topbar page-header">
-            <h2>⚖️ Grade Appeals & Litiges</h2>
-        </header>
-
-        <div class="role-tabs">
-            <a href="{{ url_for('admin_appeals') }}" class="role-tab {{ 'role-tab-active' if not statut_filtre else '' }}">Tous</a>
-            <a href="{{ url_for('admin_appeals', statut='pending') }}" class="role-tab {{ 'role-tab-active' if statut_filtre == 'pending' else '' }}">En attente</a>
-            <a href="{{ url_for('admin_appeals', statut='answered') }}" class="role-tab {{ 'role-tab-active' if statut_filtre == 'answered' else '' }}">Répondus</a>
-        </div>
-
-        <div class="form-card" style="max-width: 100%;">
-            {% if messages %}
-            <table class="grades-table">
-                <thead>
-                    <tr>
-                        <th>Étudiant</th>
-                        <th>Enseignant</th>
-                        <th>Message</th>
-                        <th>Réponse</th>
-                        <th>Statut</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for msg in messages %}
-                    <tr>
-                        <td class="announcement-title">{{ msg.etudiant }}</td>
-                        <td>{{ msg.enseignant }}</td>
-                        <td>{{ msg.contenu[:50] }}{% if msg.contenu|length > 50 %}...{% endif %}</td>
-                        <td>{{ msg.reponse[:50] if msg.reponse else '--' }}{% if msg.reponse and msg.reponse|length > 50 %}...{% endif %}</td>
-                        <td>
-                            {% if msg.statut == 'pending' %}
-                                <span class="badge-status remedial">En attente</span>
-                            {% else %}
-                                <span class="badge-status passed">Répondu</span>
-                            {% endif %}
-                        </td>
-                        <td class="announcement-date">{{ msg.date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="empty-state">Aucun message pour le moment.</div>
-            {% endif %}
-        </div>
-    </main>
-
+{% block content %}
+<div class="role-tabs">
+    <a href="{{ url_for('admin_appeals') }}" class="role-tab {{ 'role-tab-active' if not statut_filtre else '' }}">Tous</a>
+    <a href="{{ url_for('admin_appeals', statut='pending') }}" class="role-tab {{ 'role-tab-active' if statut_filtre == 'pending' else '' }}">En attente</a>
+    <a href="{{ url_for('admin_appeals', statut='answered') }}" class="role-tab {{ 'role-tab-active' if statut_filtre == 'answered' else '' }}">Repondus</a>
 </div>
-</body>
-</html>
+
+<div class="form-card" style="max-width: 100%;">
+    {% if messages %}
+    <table class="grades-table">
+        <thead>
+            <tr>
+                <th>Etudiant</th>
+                <th>Enseignant</th>
+                <th>Message</th>
+                <th>Reponse</th>
+                <th>Statut</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for msg in messages %}
+            <tr>
+                <td class="announcement-title">{{ msg.etudiant }}</td>
+                <td>{{ msg.enseignant }}</td>
+                <td>{{ msg.contenu[:50] }}{% if msg.contenu|length > 50 %}...{% endif %}</td>
+                <td>{{ msg.reponse[:50] if msg.reponse else '--' }}{% if msg.reponse and msg.reponse|length > 50 %}...{% endif %}</td>
+                <td>
+                    {% if msg.statut == 'pending' %}
+                        <span class="badge-status remedial">En attente</span>
+                    {% else %}
+                        <span class="badge-status passed">Repondu</span>
+                    {% endif %}
+                </td>
+                <td class="announcement-date">{{ msg.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">Aucun message pour le moment.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CampusLink - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <img src="{{ url_for('static', filename='uploads/' + current_photo) if current_photo != 'avatar.png' else url_for('static', filename='images/avatar.png') }}"
+                 class="sidebar-avatar" alt="Avatar">
+            <div class="sidebar-brand"><strong>CampusLink</strong><br>SUPMTI</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            {% if current_role == 'admin' %}
+                <a href="{{ url_for('dashboard_admin') }}" class="nav-item {{ 'active' if request.endpoint == 'dashboard_admin' }}">Dashboard</a>
+                <a href="{{ url_for('admin_announcements') }}" class="nav-item {{ 'active' if request.endpoint in ['admin_announcements','edit_announcement'] }}">Announcements</a>
+                <a href="{{ url_for('academic_structure') }}" class="nav-item {{ 'active' if request.endpoint == 'academic_structure' }}">Academic Structuring</a>
+                <a href="{{ url_for('user_management') }}" class="nav-item {{ 'active' if request.endpoint in ['user_management','edit_user'] }}">User Management</a>
+                <a href="{{ url_for('admin_appeals') }}" class="nav-item {{ 'active' if request.endpoint == 'admin_appeals' }}">Grade Appeals</a>
+                <a href="{{ url_for('settings_admin') }}" class="nav-item {{ 'active' if request.endpoint == 'settings_admin' }}">Settings</a>
+
+            {% elif current_role == 'enseignant' %}
+                <a href="{{ url_for('grade_entry') }}" class="nav-item {{ 'active' if request.endpoint == 'grade_entry' }}">Grade Entry</a>
+                <a href="{{ url_for('appeals_enseignant') }}" class="nav-item {{ 'active' if request.endpoint == 'appeals_enseignant' }}">Appeals</a>
+                <a href="{{ url_for('settings_enseignant') }}" class="nav-item {{ 'active' if request.endpoint == 'settings_enseignant' }}">Settings</a>
+
+            {% elif current_role == 'etudiant' %}
+                <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'dashboard_etudiant' }}">Dashboard</a>
+                <a href="{{ url_for('grades_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'grades_etudiant' }}">My Grades</a>
+                <a href="{{ url_for('attendance_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'attendance_etudiant' }}">Attendance</a>
+                <a href="{{ url_for('send_appeal') }}" class="nav-item {{ 'active' if request.endpoint == 'send_appeal' }}">Send Appeal</a>
+                <a href="{{ url_for('settings_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'settings_etudiant' }}">Settings</a>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}" class="nav-item logout-link">Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar page-header">
+            <h2>{% block page_header %}{% endblock %}</h2>
+            <div class="topbar-right">
+                <span>{{ current_nom }}</span>
+                <img src="{{ url_for('static', filename='uploads/' + current_photo) if current_photo != 'avatar.png' else url_for('static', filename='images/avatar.png') }}"
+                     class="topbar-avatar" alt="Avatar">
+            </div>
+        </header>
+
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,11 +1,15 @@
-document.getElementById('langBtn').addEventListener('click', function() {
-    document.getElementById('langDropdown').classList.toggle('show');
-});
+document.addEventListener('DOMContentLoaded', function () {
+    var langBtn = document.getElementById('langBtn');
+    var langDropdown = document.getElementById('langDropdown');
 
-document.querySelectorAll('.lang-dropdown a').forEach(function(link) {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const lang = this.getAttribute('data-lang');
-        window.location.href = '/set-language/' + lang;
-    });
+    if (langBtn && langDropdown) {
+        langBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            langDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function () {
+            langDropdown.classList.remove('show');
+        });
+    }
 });

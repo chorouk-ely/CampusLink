@@ -2,28 +2,30 @@
 <html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
 <head>
     <meta charset="UTF-8">
-    <title>CampusLink - Vérification</title>
+    <title>CampusLink - Verification</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-<div class="login-form-side" style="max-width: 450px; margin: 80px auto;">
-    <div class="login-header">
-        <span class="logo-icon">🎓</span>
-        <div><strong>CampusLink</strong><br>SUPMTI</div>
+<div class="auth-card-page">
+    <div class="auth-card">
+        <div class="login-header">
+            <span class="logo-icon">CL</span>
+            <div><strong>CampusLink</strong><br>SUPMTI</div>
+        </div>
+
+        <h2>Entrez le code recu</h2>
+        <p class="auth-subtitle">Un code a 6 chiffres a ete envoye a votre email (regardez le terminal du serveur pour l'instant).</p>
+
+        {% if erreur %}
+        <p class="login-error">{{ erreur }}</p>
+        {% endif %}
+
+        <form method="POST">
+            <label>Code de verification</label>
+            <input type="text" name="code" placeholder="123456" maxlength="6" required>
+            <button type="submit" class="btn-submit" style="margin-top: 20px;">Verifier</button>
+        </form>
     </div>
-
-    <h2>Entrez le code reçu</h2>
-    <p style="margin: 15px 0; color: #555;">Un code à 6 chiffres a été envoyé à votre email (regarde le terminal pour l'instant).</p>
-
-    {% if erreur %}
-        <p style="color: red; margin-bottom: 15px;">{{ erreur }}</p>
-    {% endif %}
-
-    <form method="POST">
-        <label>Code de vérification</label>
-        <input type="text" name="code" placeholder="123456" maxlength="6" required>
-        <button type="submit" class="btn-submit" style="margin-top: 20px;">Vérifier</button>
-    </form>
 </div>
 </body>
 </html>

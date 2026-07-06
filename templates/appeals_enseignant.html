@@ -1,121 +1,85 @@
-<!DOCTYPE html>
-<html lang="fr">
+{% extends "base.html" %}
+{% block title %}Appeals{% endblock %}
+{% block page_header %}Welcome back, {{ current_nom }}{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>CampusLink - Appeals</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/appeals_enseignant.css') }}">
-</head>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/appeals_enseignant.css') }}">
+{% endblock %}
 
-<body>
-    <div class="dashboard-layout">
+{% block content %}
+{% if success %}
+<div class="alert alert-success">Reponse envoyee avec succes !</div>
+{% endif %}
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="sidebar-profile">
-                <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar">
-                <p class="sidebar-name">{{ nom }}</p>
+<div class="appeals-layout">
+    <div class="compose-card">
+        <h3>Composer le message</h3>
+        <form method="POST" action="{{ url_for('appeals_enseignant') }}">
+
+            <textarea name="reponse" class="compose-textarea" placeholder="Ecrivez votre reponse ici..."
+                required></textarea>
+
+            <div class="compose-right">
+                <select name="classe" id="classeSelect" class="compose-select"
+                    onchange="filterEtudiants(this.value)">
+                    <option value="" disabled selected>Selectionner le niveau</option>
+                    {% for classe in classes %}
+                    <option value="{{ classe }}">{{ classe }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="message_id" id="etudiantSelect" class="compose-select" required>
+                    <option value="" disabled selected>Selectionner l'etudiant</option>
+                    {% for msg in messages_pending %}
+                    <option value="{{ msg.id }}" data-classe="{{ msg.classe }}">
+                        {{ msg.etudiant_nom }} - {{ msg.date_envoi }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn-envoyer">Envoyer</button>
             </div>
-            <nav class="sidebar-nav">
-                <a href="{{ url_for('dashboard_enseignant') }}" class="nav-item"> Dashboard</a>
-                <a href="{{ url_for('grade_entry') }}" class="nav-item">Grade Entry</a>
-                <a href="{{ url_for('appeals_enseignant') }}" class="nav-item active"> Appeals</a>
-                <a href="{{ url_for('settings_enseignant') }}" class="nav-item"> Settings</a>
-            </nav>
-        </aside>
-
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            <header class="topbar">
-                <h2>Welcome back, {{ nom }}!</h2>
-                <div class="topbar-right">
-                    <span>🔔</span>
-                    <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
-                </div>
-            </header>
-
-            {% if success %}
-            <div class="alert alert-success">✅ Réponse envoyée avec succès !</div>
-            {% endif %}
-
-            <!-- COMPOSE REPLY CARD -->
-            <div class="appeals-layout">
-
-                <div class="compose-card">
-                    <h3>✏️ Composer le message</h3>
-                    <form method="POST" action="{{ url_for('appeals_enseignant') }}">
-
-                        <textarea name="reponse" class="compose-textarea" placeholder="Écrivez votre réponse ici..."
-                            required></textarea>
-
-                        <div class="compose-right">
-                            <!-- Filtre par niveau/classe -->
-                            <select name="classe" id="classeSelect" class="compose-select"
-                                onchange="filterEtudiants(this.value)">
-                                <option value="" disabled selected>🗂 Sélectionner le niveau</option>
-                                {% for classe in classes %}
-                                <option value="{{ classe }}">{{ classe }}</option>
-                                {% endfor %}
-                            </select>
-
-                            <!-- Liste des étudiants filtrée par classe -->
-                            <select name="message_id" id="etudiantSelect" class="compose-select" required>
-                                <option value="" disabled selected>👤 Sélectionner l'étudiant</option>
-                                {% for msg in messages_pending %}
-                                <option value="{{ msg.id }}" data-classe="{{ msg.classe }}">
-                                    {{ msg.etudiant_nom }} — {{ msg.date_envoi }}
-                                </option>
-                                {% endfor %}
-                            </select>
-
-                            <button type="submit" class="btn-envoyer">Envoyer</button>
-                        </div>
-                    </form>
-                </div>
-
-            </div>
-
-            <!-- RECEIVED APPEALS TABLE -->
-            {% if messages_pending or messages_answered %}
-            <div class="appeals-table-card">
-                <h3>Messages Reçus</h3>
-                <table class="appeals-table">
-                    <thead>
-                        <tr>
-                            <th>Étudiant</th>
-                            <th>Classe</th>
-                            <th>Message</th>
-                            <th>Date</th>
-                            <th>Statut</th>
-                            <th>Réponse</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for msg in messages_pending + messages_answered %}
-                        <tr>
-                            <td>{{ msg.etudiant_nom }}</td>
-                            <td>{{ msg.classe or '—' }}</td>
-                            <td class="msg-contenu">{{ msg.contenu }}</td>
-                            <td>{{ msg.date_envoi }}</td>
-                            <td>
-                                {% if msg.statut == 'pending' %}
-                                <span class="status-badge pending">En attente</span>
-                                {% else %}
-                                <span class="status-badge answered">Répondu</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ msg.reponse or '—' }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% endif %}
-
-        </main>
+        </form>
     </div>
-    <script src="{{ url_for('static', filename='js/appeals_enseignant.js') }}"></script>
-</body>
+</div>
 
-</html>
+{% if messages_pending or messages_answered %}
+<div class="appeals-table-card">
+    <h3>Messages Recus</h3>
+    <table class="appeals-table">
+        <thead>
+            <tr>
+                <th>Etudiant</th>
+                <th>Classe</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Reponse</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for msg in messages_pending + messages_answered %}
+            <tr>
+                <td>{{ msg.etudiant_nom }}</td>
+                <td>{{ msg.classe or '--' }}</td>
+                <td class="msg-contenu">{{ msg.contenu }}</td>
+                <td>{{ msg.date_envoi }}</td>
+                <td>
+                    {% if msg.statut == 'pending' %}
+                    <span class="status-badge pending">En attente</span>
+                    {% else %}
+                    <span class="status-badge answered">Repondu</span>
+                    {% endif %}
+                </td>
+                <td>{{ msg.reponse or '--' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/appeals_enseignant.js') }}"></script>
+{% endblock %}

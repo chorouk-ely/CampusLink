@@ -32,9 +32,12 @@ body {
 
 .logo-icon {
     background-color: #2ebd85;
-    padding: 8px;
+    color: white;
+    padding: 8px 10px;
     border-radius: 8px;
-    font-size: 18px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
 .nav-links {
@@ -103,6 +106,17 @@ body {
 
 .lang-dropdown a:hover {
     background-color: #f0f0f0;
+}
+
+.lang-dropdown a.lang-active {
+    color: #2ebd85;
+    font-weight: bold;
+}
+
+.contact-info {
+    font-weight: 600;
+    color: #2ebd85;
+    margin-top: 10px;
 }
 
 /* HERO */
@@ -350,4 +364,23 @@ html[dir="rtl"] .btn-primary {
     text-align: center;
     padding: 80px 60px;
     background-color: #f7f8fa;
+}
+.contact-section {
+    text-align: center;
+    padding: 60px;
+    background-color: #f7f8fa;
+}
+
+.contact-info {
+    margin-top: 15px;
+    font-size: 16px;
+    color: #2ebd85;
+    font-weight: 600;
+}
+
+.empty-news {
+    color: #777;
+    text-align: center;
+    padding: 30px;
+    width: 100%;
 }

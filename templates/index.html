@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,36 +11,37 @@
     <!-- NAVBAR -->
     <header class="navbar">
         <div class="logo">
-            <span class="logo-icon">🎓</span>
+            <span class="logo-icon">CL</span>
             <span class="logo-text">CampusLink SUPMTI</span>
         </div>
         <nav class="nav-links">
-            <a href="#home" data-i18n="home">Home</a>
-            <a href="#announcements" data-i18n="announcements">Announcements</a>
-            <a href="#faculty" data-i18n="faculty">Faculty</a>
-            <a href="#contact" data-i18n="contact">Contact</a>
+            <a href="#home">{{ t.nav_home }}</a>
+            <a href="#announcements">{{ t.nav_announcements }}</a>
+            <a href="#faculty">{{ t.nav_faculty }}</a>
+            <a href="#contact">{{ t.nav_contact }}</a>
         </nav>
         <div class="navbar-right">
             <div class="lang-switcher">
-                <button class="lang-btn" id="langBtn">🌐 EN</button>
+                <button class="lang-btn" id="langBtn">
+                    {% if lang == 'fr' %}FR{% elif lang == 'ar' %}AR{% else %}EN{% endif %}
+                </button>
                 <div class="lang-dropdown" id="langDropdown">
-                    <a href="#" data-lang="en">English</a>
-                    <a href="#" data-lang="fr">Français</a>
-                    <a href="#" data-lang="ar">العربية</a>
+                    <a href="{{ url_for('set_language', lang='fr') }}" class="{{ 'lang-active' if lang == 'fr' else '' }}">Francais</a>
+                    <a href="{{ url_for('set_language', lang='ar') }}" class="{{ 'lang-active' if lang == 'ar' else '' }}">العربية</a>
+                    <a href="{{ url_for('set_language', lang='en') }}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
                 </div>
             </div>
-            <a href="{{ url_for('login') }}" class="btn-login" data-i18n="login">Login / Space Access</a>
+            <a href="{{ url_for('login') }}" class="btn-login">{{ t.nav_login }}</a>
         </div>
     </header>
 
     <!-- HERO -->
     <section id="home" class="hero">
         <div class="hero-text">
-            <h1 data-i18n="hero_title">Your Connected Academic Universe</h1>
-            <p data-i18n="hero_subtitle">Access your courses, connect with faculty, stay updated with campus news, and manage your academic journey all in one place.</p>
+            <h1>{{ t.hero_title }}</h1>
+            <p>{{ t.hero_subtitle }}</p>
             <div class="hero-actions">
-                <a href="{{ url_for('login') }}" class="btn-primary" data-i18n="getStarted">Get Started →</a>
-                
+                <a href="{{ url_for('login') }}" class="btn-primary">{{ t.get_started }}</a>
             </div>
         </div>
         <div class="hero-image">
@@ -48,92 +49,58 @@
         </div>
     </section>
 
-    <!-- NEWS -->
+    <!-- ANNOUNCEMENTS -->
     <section id="announcements" class="news-section">
-        <div class="news-icon">📰</div>
-        <h2 data-i18n="latest_news">Latest School News</h2>
-        <p class="section-subtitle" data-i18n="news_subtitle">Stay informed with the most recent announcements, events, and updates from our campus community.</p>
+        <h2>{{ t.latest_news }}</h2>
+        <p class="section-subtitle">{{ t.news_subtitle }}</p>
 
         <div class="news-cards">
-            <div class="news-card">
-                <div class="news-image">
-                    <span class="badge badge-red" data-i18n="exams_badge">Exams</span>
+            {% if annonces %}
+                {% for annonce in annonces %}
+                <div class="news-card">
+                    <div class="news-image">
+                        <span class="badge badge-green">Annonce</span>
+                    </div>
+                    <div class="news-content">
+                        <span class="news-date">{{ annonce.date }}</span>
+                        <h3>{{ annonce.titre }}</h3>
+                        <p>{{ annonce.contenu[:100] }}{% if annonce.contenu|length > 100 %}...{% endif %}</p>
+                    </div>
                 </div>
-                <div class="news-content">
-                    <span class="news-date">📅 June 15, 2026</span>
-                    <h3 data-i18n="exam_title">Final Exam Schedule Released for Summer Semester</h3>
-                    <p data-i18n="exam_desc">The complete examination timetable for all departments has been published...</p>
-                </div>
-            </div>
-
-            <div class="news-card">
-                <div class="news-image">
-                    <span class="badge badge-purple" data-i18n="events_badge">Events</span>
-                </div>
-                <div class="news-content">
-                    <span class="news-date">📅 June 12, 2026</span>
-                    <h3 data-i18n="events_title">Annual Graduation Ceremony Set for July 2026</h3>
-                    <p data-i18n="events_desc">Join us in celebrating the achievements of our graduating class. The ceremony...</p>
-                </div>
-            </div>
-
-            <div class="news-card">
-                <div class="news-image">
-                    <span class="badge badge-green" data-i18n="research_badge">Research</span>
-                </div>
-                <div class="news-content">
-                    <span class="news-date">📅 June 10, 2026</span>
-                    <h3 data-i18n="research_title">New Research Lab Inaugurated in Computer Science...</h3>
-                    <p data-i18n="research_desc">State-of-the-art facilities equipped with cutting-edge technology will support...</p>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-news">{{ t.no_news }}</p>
+            {% endif %}
         </div>
     </section>
 
     <!-- FACULTY -->
-    <!-- FACULTY -->
-<section id="faculty" class="faculty-section">
-    <h2>Meet Our Faculty</h2>
-    <p class="section-subtitle">Our distinguished professors bring years of expertise and dedication to provide world-class education and mentorship.</p>
+    <section id="faculty" class="faculty-section">
+        <h2>{{ t.meet_faculty }}</h2>
+        <p class="section-subtitle">{{ t.faculty_subtitle }}</p>
 
-    <div class="faculty-cards">
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/prof1.jpg') }}" alt="Dr. Sarah Mitchell" class="faculty-photo">
-            <h3>Dr. Sarah Mitchell</h3>
-            <p class="faculty-title">Computer Science Professor</p>
-            <p class="faculty-degree">Ph.D. in Computer Science, MIT</p>
-            <p class="faculty-email">✉️ s.mitchell@supmti.edu</p>
+        <div class="faculty-cards">
+            {% if enseignants %}
+                {% for ens in enseignants %}
+                <div class="faculty-card">
+                    <img src="{{ url_for('static', filename='uploads/' + ens.photo) if ens.photo else url_for('static', filename='images/avatar.png') }}"
+                         alt="{{ ens.nom }}" class="faculty-photo">
+                    <h3>{{ ens.nom }}</h3>
+                    <p class="faculty-title">Enseignant</p>
+                    <p class="faculty-email">{{ ens.email }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-news">{{ t.no_faculty }}</p>
+            {% endif %}
         </div>
+    </section>
 
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/prof2.jpg') }}" alt="Prof. David Chen" class="faculty-photo">
-            <h3>Prof. David Chen</h3>
-            <p class="faculty-title">Mathematics Department Head</p>
-            <p class="faculty-degree">Ph.D. in Applied Mathematics, Stanford</p>
-            <p class="faculty-email">✉️ d.chen@supmti.edu</p>
-        </div>
-
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/prof3.jpg') }}" alt="Dr. Emily Rodriguez" class="faculty-photo">
-            <h3>Dr. Emily Rodriguez</h3>
-            <p class="faculty-title">Engineering Professor</p>
-            <p class="faculty-degree">Ph.D. in Mechanical Engineering, Caltech</p>
-            <p class="faculty-email">✉️ e.rodriguez@supmti.edu</p>
-        </div>
-
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/prof4.jpg') }}" alt="Prof. Michael Thompson" class="faculty-photo">
-            <h3>Prof. Michael Thompson</h3>
-            <p class="faculty-title">Business Administration Professor</p>
-            <p class="faculty-degree">Ph.D. in Economics, Harvard University</p>
-            <p class="faculty-email">✉️ m.thompson@supmti.edu</p>
-        </div>
-    </div>
-</section>
-
-    <!-- CONTACT (placeholder pour l'instant) -->
+    <!-- CONTACT -->
     <section id="contact" class="contact-section">
-        <h2>Contact</h2>
+        <h2>{{ t.contact_title }}</h2>
+        <p class="section-subtitle">{{ t.contact_subtitle }}</p>
+        <p class="contact-info">support@supmti.ma</p>
     </section>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

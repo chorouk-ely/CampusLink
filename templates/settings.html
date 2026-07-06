@@ -1,96 +1,52 @@
-<!DOCTYPE html>
-<html lang="fr">
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block page_header %}Welcome back, {{ current_nom }}{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>CampusLink - Settings</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
-</head>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
 
-<body>
-    <div class="dashboard-layout">
+{% block content %}
+{% if success %}
+<div class="alert alert-success">Mot de passe change avec succes !</div>
+{% endif %}
+{% if erreur %}
+<div class="alert alert-error">{{ erreur }}</div>
+{% endif %}
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="sidebar-profile">
-                <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar">
-            </div>
-            <nav class="sidebar-nav">
-                <!-- la sidebar s'adapte avec un if Jinja2 -->
-                {% if role == 'etudiant' %}
-                <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item">🏠 Dashboard</a>
-                <a href="{{ url_for('grades_etudiant') }}" class="nav-item">📊 My Grades</a>
-                <a href="{{ url_for('attendance_etudiant') }}" class="nav-item">📅 Attendance</a>
-                <a href="{{ url_for('send_appeal') }}" class="nav-item">💬 Send Appeal to Teacher</a>
-                <a href="{{ url_for('settings_etudiant') }}" class="nav-item active">⚙️ Settings</a>
-                {% else %}
-                <a href="{{ url_for('dashboard_enseignant') }}" class="nav-item">🏠 Dashboard</a>
-                <a href="{{ url_for('grade_entry') }}" class="nav-item">📝 Grade Entry</a>
-                <a href="{{ url_for('appeals_enseignant') }}" class="nav-item">📢 Appeals</a>
-                <a href="{{ url_for('settings_enseignant') }}" class="nav-item active">⚙️ Settings</a>
-                {% endif %}
-            </nav>
-        </aside>
+<div class="settings-wrapper">
+    <div class="settings-card">
+        <h3>Parametres</h3>
 
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            <header class="topbar">
-                <h2>Welcome back, {{ nom }}!</h2>
-                <div class="topbar-right">
-                    <img src="{{ url_for('static', filename='images/avatar.png') }}" class="topbar-avatar">
+        <button class="toggle-section" onclick="togglePasswordForm()">
+            Changer le mot de passe
+        </button>
+
+        <div class="password-form" id="passwordForm">
+            <form method="POST">
+                <div class="input-group">
+                    <input type="password" name="ancien_mdp" placeholder="Ancien Mot de Passe" required>
                 </div>
-            </header>
 
-            {% if success %}
-            <div class="alert alert-success">✅ Mot de passe changé avec succès !</div>
-            {% endif %}
-            {% if erreur %}
-            <div class="alert alert-error">❌ {{ erreur }}</div>
-            {% endif %}
-
-            <!-- SETTINGS CARD -->
-            <div class="settings-wrapper">
-                <div class="settings-card">
-                    <h3>Paramètres (Settings)</h3>
-
-                    <button class="toggle-section" onclick="togglePasswordForm()">
-                        🔒 Changer le mot de passe
-                    </button>
-
-                    <div class="password-form" id="passwordForm">
-                        <form method="POST">
-                            <div class="input-group">
-                                <span class="input-icon">🔑</span>
-                                <input type="password" name="ancien_mdp" placeholder="Ancien Mot de Passe" required>
-                            </div>
-
-                            <div class="input-group">
-                                <span class="input-icon">🔑</span>
-                                <input type="password" name="nouveau_mdp" placeholder="Nouveau Mot de Passe (Robuste)"
-                                    required>
-                            </div>
-
-                            <div class="input-group">
-                                <span class="input-icon">✏️</span>
-                                <input type="password" name="confirmer_mdp" placeholder="Confirmer Nouveau Mot de Passe"
-                                    required>
-                            </div>
-
-                            <div class="form-actions">
-                                <button type="submit" class="btn-changer">✔ Changer</button>
-                                <button type="button" class="btn-annuler"
-                                    onclick="togglePasswordForm()">Annuler</button>
-                            </div>
-                        </form>
-                    </div>
-
+                <div class="input-group">
+                    <input type="password" name="nouveau_mdp" placeholder="Nouveau Mot de Passe" required>
                 </div>
-            </div>
 
-        </main>
+                <div class="input-group">
+                    <input type="password" name="confirmer_mdp" placeholder="Confirmer Nouveau Mot de Passe" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-changer">Changer</button>
+                    <button type="button" class="btn-annuler" onclick="togglePasswordForm()">Annuler</button>
+                </div>
+            </form>
+        </div>
+
     </div>
-    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-</body>
+</div>
+{% endblock %}
 
-</html>
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}

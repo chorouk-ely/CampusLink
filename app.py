@@ -10,14 +10,65 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'cle-secrete-a-changer-plus-tard'
 UPLOAD_FOLDER = 'static/uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+@app.context_processor
+def inject_current_user():
+    """Rend current_role, current_nom et current_photo disponibles
+    automatiquement dans TOUS les templates, sans que chaque route
+    ait besoin de les transmettre manuellement."""
+    current_role = session.get('user_role')
+    current_nom = session.get('user_nom')
+    current_photo = 'avatar.png'
+
+    if 'user_id' in session:
+        connexion = sqlite3.connect('campuslink.db')
+        curseur = connexion.cursor()
+        curseur.execute("SELECT photo FROM users WHERE id = ?", (session.get('user_id'),))
+        resultat = curseur.fetchone()
+        connexion.close()
+        if resultat and resultat[0]:
+            current_photo = resultat[0]
+
+    return dict(
+        current_role=current_role,
+        current_nom=current_nom,
+        current_photo=current_photo
+    )
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    lang = session.get('lang', 'fr')
+    if lang not in ('fr', 'ar', 'en'):
+        lang = 'fr'
+    t = TRANSLATIONS[lang]
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+    curseur.execute(
+        'SELECT titre, contenu, date_publication FROM annonces WHERE archivee = 0 ORDER BY date_publication DESC LIMIT 6'
+    )
+    annonces = [{'titre': r[0], 'contenu': r[1], 'date': r[2]} for r in curseur.fetchall()]
+
+    curseur.execute(
+        "SELECT nom, email, photo FROM users WHERE role = 'enseignant' ORDER BY nom"
+    )
+    enseignants = [{'nom': r[0], 'email': r[1], 'photo': r[2]} for r in curseur.fetchall()]
+    connexion.close()
+
+    return render_template('index.html', lang=lang, t=t, annonces=annonces, enseignants=enseignants)
 
 @app.route('/set-language/<lang>')
 def set_language(lang):
-    session['lang'] = lang
+    if lang in ('fr', 'ar', 'en'):
+        session['lang'] = lang
     return redirect(request.referrer or url_for('home'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -83,16 +134,7 @@ def dashboard_etudiant():
 def dashboard_enseignant():
     if session.get('user_role') != 'enseignant':
         return redirect(url_for('login'))
-
-    connexion = sqlite3.connect('campuslink.db')
-    curseur = connexion.cursor()
-    curseur.execute("SELECT photo FROM users WHERE id = ?", (session.get('user_id'),))
-    resultat = curseur.fetchone()
-    connexion.close()
-
-    photo = resultat[0] if resultat and resultat[0] else 'avatar.png'
-
-    return render_template('dashboard_enseignant.html', nom=session.get('user_nom'), photo=photo)
+    return redirect(url_for('grade_entry'))
 
 
 @app.route('/grade-entry', methods=['GET', 'POST'])
@@ -188,9 +230,7 @@ def dashboard_admin():
     resultat = curseur.fetchone()
     connexion.close()
 
-    photo = resultat[0] if resultat and resultat[0] else 'avatar.png'
-
-    connexion.close()
+    photo = resultat[0] if resultat and resultat[0] else 'avatar.png' 
 
     return render_template(
         'dashboard_admin.html',
@@ -895,23 +935,6 @@ def delete_user(user_id):
     connexion.close()
 
     return redirect(url_for('user_management', role=role))
-@app.route('/settings-admin', methods=['GET', 'POST'])
-def settings_admin():
-    if session.get('user_role') != 'admin':
-        return redirect(url_for('login'))
-
-    success, erreur = False, None
-
-    if request.method == 'POST':
-        success, erreur = changer_mot_de_passe(session.get('user_id'))
-
-    return render_template(
-        'settings.html',
-        nom=session.get('user_nom'),
-        role='admin',
-        success=success,
-        erreur=erreur
-    )
 @app.route('/admin/appeals')
 def admin_appeals():
     if session.get('user_role') != 'admin':
@@ -955,13 +978,89 @@ def admin_appeals():
         messages=messages,
         statut_filtre=statut_filtre
     )
-<<<<<<< HEAD
-    @app.route('/logout')
-    def logout():
-        session.clear()
+
+
+@app.route('/settings-admin', methods=['GET', 'POST'])
+def settings_admin():
+    if session.get('user_role') != 'admin':
         return redirect(url_for('login'))
-=======
-    
->>>>>>> 7bf849dc10f22f52e1a859c94d9c049e621a3592
+
+    success, erreur = False, None
+
+    if request.method == 'POST':
+        success, erreur = changer_mot_de_passe(session.get('user_id'))
+
+    return render_template(
+        'settings.html',
+        nom=session.get('user_nom'),
+        role='admin',
+        success=success,
+        erreur=erreur
+    )
+
+
+@app.route('/export-pdf-notes')
+def export_pdf_notes():
+    if session.get('user_role') != 'etudiant':
+        return redirect(url_for('login'))
+
+    from fpdf import FPDF
+
+    etudiant_id = session.get('user_id')
+    nom_etudiant = session.get('user_nom', 'Etudiant')
+
+    connexion = sqlite3.connect('campuslink.db')
+    curseur = connexion.cursor()
+    curseur.execute(
+        'SELECT module, semestre, cc_grade, exam_grade, seuil FROM notes WHERE etudiant_id = ? ORDER BY semestre, module',
+        (etudiant_id,)
+    )
+    rows = curseur.fetchall()
+    connexion.close()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Helvetica', 'B', 16)
+    pdf.cell(0, 10, 'CampusLink SUPMTI', ln=True, align='C')
+    pdf.set_font('Helvetica', 'B', 13)
+    pdf.cell(0, 8, 'Releve de Notes', ln=True, align='C')
+    pdf.set_font('Helvetica', '', 11)
+    pdf.cell(0, 7, f'Etudiant : {nom_etudiant}', ln=True, align='C')
+    pdf.cell(0, 7, f'Date : {datetime.now().strftime("%d/%m/%Y")}', ln=True, align='C')
+    pdf.ln(6)
+
+    col_widths = [65, 25, 25, 25, 35, 15]
+    headers = ['Module', 'CC/20', 'Exam/20', 'Coeff', 'Moyenne/20', 'Statut']
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_fill_color(46, 189, 133)
+    pdf.set_text_color(255, 255, 255)
+    for i, h in enumerate(headers):
+        pdf.cell(col_widths[i], 8, h, border=1, align='C', fill=True)
+    pdf.ln()
+
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_text_color(0, 0, 0)
+    fill = False
+    for r in rows:
+        module, semestre, cc, exam, seuil = r
+        seuil = seuil if seuil else 10
+        cc_val = cc if cc is not None else 0
+        exam_val = exam if exam is not None else 0
+        moyenne = round(cc_val * 0.4 + exam_val * 0.6, 2)
+        statut = 'Passe' if (cc is not None and exam is not None and moyenne >= seuil) else ('Rattrapage' if (cc is not None and exam is not None) else '--')
+        pdf.set_fill_color(245, 245, 245) if fill else pdf.set_fill_color(255, 255, 255)
+        vals = [module[:35], str(cc) if cc is not None else '--', str(exam) if exam is not None else '--', '2', str(moyenne) if cc is not None and exam is not None else '--', statut]
+        for i, v in enumerate(vals):
+            pdf.cell(col_widths[i], 7, v, border=1, align='C', fill=True)
+        pdf.ln()
+        fill = not fill
+
+    from flask import make_response
+    response = make_response(bytes(pdf.output()))
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=releve_notes_{nom_etudiant.replace(" ", "_")}.pdf'
+    return response
+
+
 if __name__ == '__main__':
     app.run(debug=True)
