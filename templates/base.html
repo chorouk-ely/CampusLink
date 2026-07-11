@@ -33,7 +33,6 @@
             {% elif current_role == 'etudiant' %}
                 <a href="{{ url_for('dashboard_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'dashboard_etudiant' }}">Dashboard</a>
                 <a href="{{ url_for('grades_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'grades_etudiant' }}">My Grades</a>
-                <a href="{{ url_for('attendance_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'attendance_etudiant' }}">Attendance</a>
                 <a href="{{ url_for('send_appeal') }}" class="nav-item {{ 'active' if request.endpoint == 'send_appeal' }}">Send Appeal</a>
                 <a href="{{ url_for('settings_etudiant') }}" class="nav-item {{ 'active' if request.endpoint == 'settings_etudiant' }}">Settings</a>
             {% endif %}

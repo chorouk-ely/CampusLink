@@ -53,17 +53,7 @@ curseur.execute('''
         FOREIGN KEY (enseignant_id) REFERENCES users (id)
     )
 ''')
-curseur.execute('''
-    CREATE TABLE IF NOT EXISTS attendance (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        etudiant_id INTEGER NOT NULL,
-        module TEXT NOT NULL,
-        semestre TEXT NOT NULL,
-        presences INTEGER DEFAULT 0,
-        absences INTEGER DEFAULT 0,
-        FOREIGN KEY (etudiant_id) REFERENCES users (id)
-    )
-''')
+
 curseur.execute('''
     CREATE TABLE IF NOT EXISTS departments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

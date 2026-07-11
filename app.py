@@ -322,46 +322,6 @@ def reset_password():
         return redirect(url_for('login'))
 
     return render_template('reset_password.html', t=t, lang=lang)
-@app.route('/attendance-etudiant')
-def attendance_etudiant():
-    if session.get('user_role') != 'etudiant':
-        return redirect(url_for('login'))
-
-    etudiant_id = session.get('user_id')
-
-    connexion = sqlite3.connect('campuslink.db')
-    curseur = connexion.cursor()
-    curseur.execute(
-        'SELECT module, semestre, presences, absences FROM attendance WHERE etudiant_id = ? ORDER BY module',
-        (etudiant_id,)
-    )
-    rows = curseur.fetchall()
-    connexion.close()
-
-    attendance = [
-        {'module': r[0], 'semestre': r[1], 'presences': r[2], 'absences': r[3]}
-        for r in rows
-    ]
-
-    total_presences = sum(r['presences'] for r in attendance)
-    total_absences  = sum(r['absences']  for r in attendance)
-    total_seances   = total_presences + total_absences
-    semestre        = attendance[0]['semestre'] if attendance else 'Semestre 1'
-
-    return render_template(
-        'attendance_etudiant.html',
-        nom=session.get('user_nom'),
-        attendance=attendance,
-        total_presences=total_presences,
-        total_absences=total_absences,
-        total_seances=total_seances,
-        semestre=semestre
-    )
-
-# ROUTE : Tableau de bord des notes de l'étudiant
-# Affiche les notes par semestre (CC, Exam, Moyenne, Statut)
-# avec le nombre de modules validés et en rattrapage
-
 @app.route('/grades-etudiant')
 def grades_etudiant():
     if session.get('user_role') != 'etudiant':
