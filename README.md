@@ -56,7 +56,6 @@ python app.py
 | Role | Email | Mot de passe |
 |---|---|---|
 | Etudiant | alex@supmti.ma | 1234 |
-| Etudiant | sara@supmti.ma | 1234 |
 | Enseignant | karim@supmti.ma | 1234 |
 | Admin | sophie@supmti.ma | 1234 |
 
@@ -71,7 +70,7 @@ CampusLink/
 ├── database.py             # Creation des tables SQLite
 ├── seed.py                 # Insertion des donnees de test
 ├── translations.py         # Traductions FR / AR / EN
-├── campuslink.db           # Base de donnees SQLite (generee)
+├── campuslink.db            # Base de donnees SQLite (generee)
 │
 ├── static/
 │   ├── css/                # Feuilles de style par espace
@@ -88,7 +87,6 @@ CampusLink/
     ├── reset_password.html
     ├── dashboard_etudiant.html
     ├── grades_etudiant.html
-    ├── attendance_etudiant.html
     ├── appeal.html
     ├── grade_entry.html
     ├── appeals_enseignant.html
@@ -104,7 +102,7 @@ CampusLink/
 
 ---
 
-## Base de donnees - 11 tables
+## Base de donnees - 10 tables
 
 | Table | Description |
 |---|---|
@@ -112,7 +110,6 @@ CampusLink/
 | `notes` | Notes CC + Examen par module et semestre |
 | `annonces` | Annonces publiees par l'admin |
 | `messages` | Appels entre etudiants et enseignants |
-| `attendance` | Presences et absences par module |
 | `departments` | Departements de l'ecole |
 | `filieres` | Filieres par departement |
 | `annees` | Annees par filiere |
@@ -128,19 +125,19 @@ CampusLink/
 - Annonces reelles publiees par l'admin
 - Liste des enseignants avec leur photo
 - Changement de langue : Francais / Arabe / Anglais
+- Recuperation de mot de passe par code de verification
 
 ### Etudiant
 - Dashboard avec statistiques
 - Notes par semestre (CC, Examen, Moyenne, Statut)
 - Export du releve de notes en PDF
-- Tableau des presences/absences par module
 - Envoi de messages aux enseignants et consultation des reponses
 - Changement de mot de passe
 
 ### Enseignant
 - Saisie des notes par classe, module et semestre
 - Calcul automatique de la moyenne selon le seuil
-- Reception et reponse aux messages des etudiants
+- Reception et reponse aux messages des etudiants (avec filtre par classe)
 - Changement de mot de passe
 
 ### Administrateur
@@ -159,19 +156,26 @@ CampusLink/
 |---|---|---|
 | `/` | Public | Page d'accueil |
 | `/login` | Public | Connexion |
-| `/forgot-password` | Public | Reinitialisation mot de passe |
+| `/logout` | Tous | Deconnexion |
+| `/set-language/<lang>` | Public | Changement de langue |
+| `/forgot-password` | Public | Demande de reinitialisation |
+| `/verify-code` | Public | Verification du code recu |
+| `/reset-password` | Public | Nouveau mot de passe |
+| `/dashboard-etudiant` | Etudiant | Tableau de bord |
 | `/grades-etudiant` | Etudiant | Tableau de notes |
 | `/export-pdf-notes` | Etudiant | Telechargement PDF |
-| `/attendance-etudiant` | Etudiant | Tableau des presences |
 | `/send-appeal` | Etudiant | Message a un enseignant |
+| `/settings-etudiant` | Etudiant | Changement de mot de passe |
+| `/dashboard-enseignant` | Enseignant | Redirection vers saisie des notes |
 | `/grade-entry` | Enseignant | Saisie des notes |
 | `/appeals-enseignant` | Enseignant | Messages recus |
+| `/settings-enseignant` | Enseignant | Changement de mot de passe |
 | `/dashboard-admin` | Admin | Dashboard |
 | `/admin/announcements` | Admin | Gestion des annonces |
 | `/admin/academic-structure` | Admin | Structure academique |
 | `/admin/users` | Admin | Gestion des utilisateurs |
 | `/admin/appeals` | Admin | Consultation des appels |
-| `/logout` | Tous | Deconnexion |
+| `/settings-admin` | Admin | Changement de mot de passe |
 
 ---
 
@@ -180,9 +184,12 @@ CampusLink/
 Les mots de passe sont stockes en clair dans cette version (stage d'initiation).
 Pour une mise en production, utiliser `werkzeug.security.generate_password_hash`.
 
+Le code de verification pour la reinitialisation du mot de passe est simule (affiche dans la console du serveur) et non envoye par email reel.
+
 ---
 
 ## Auteur
+El Youncha Malak -----El Youbi Chorouk
 
-Stage d'initiation - 3eme annee Genie Informatique
+Stage d'initiation - 3 éme annee Genie Informatique
 SUPMTI - 2026
